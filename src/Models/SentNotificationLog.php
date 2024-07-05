@@ -2,12 +2,12 @@
 
 namespace Okaufmann\LaravelNotificationLog\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 
 class SentNotificationLog extends Model
 {
-    use HasFactory;
+    use HasUlids;
 
     protected $guarded = [];
 
