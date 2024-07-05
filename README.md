@@ -1,8 +1,9 @@
 # Laravel Notification Log
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/okaufmann/laravel-notification-log.svg?style=flat-square)](https://packagist.org/packages/okaufmann/laravel-notification-log)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/okaufmann/laravel-notification-log/run-tests?label=tests)](https://github.com/okaufmann/laravel-notification-log/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/okaufmann/laravel-notification-log/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/okaufmann/laravel-notification-log/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Tests](https://github.com/okaufmann/laravel-notification-log/actions/workflows/run-tests.yml/badge.svg)](https://github.com/okaufmann/laravel-notification-log/actions/workflows/run-tests.yml)
+[![PHPStan](https://github.com/okaufmann/laravel-notification-log/actions/workflows/phpstan.yml/badge.svg)](https://github.com/okaufmann/laravel-notification-log/actions/workflows/phpstan.yml)
+[![Check & fix styling](https://github.com/okaufmann/laravel-notification-log/actions/workflows/php-code-style.yml/badge.svg)](https://github.com/okaufmann/laravel-notification-log/actions/workflows/php-cs-fixer.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/okaufmann/laravel-notification-log.svg?style=flat-square)](https://packagist.org/packages/okaufmann/laravel-notification-log)
 
 Logs every sent Notification and Mail of your entire Laravel Project.
