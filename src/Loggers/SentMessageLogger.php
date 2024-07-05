@@ -3,11 +3,11 @@
 namespace Okaufmann\LaravelNotificationLog\Loggers;
 
 use Illuminate\Mail\Events\MessageSent;
+use Okaufmann\LaravelNotificationLog\Models\SentMessageLog;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
-use Okaufmann\LaravelNotificationLog\Models\SentMessageLog;
 
 class SentMessageLogger
 {

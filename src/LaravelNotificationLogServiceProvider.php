@@ -6,12 +6,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\ChannelManager as BaseChannelManager;
 use Illuminate\Support\Facades\Event;
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Okaufmann\LaravelNotificationLog\Commands\CompressAllMessages;
 use Okaufmann\LaravelNotificationLog\Commands\DecompressAllMessages;
 use Okaufmann\LaravelNotificationLog\Listeners\MessageEventListener;
 use Okaufmann\LaravelNotificationLog\Notifications\ChannelManager;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelNotificationLogServiceProvider extends PackageServiceProvider
 {

@@ -3,8 +3,8 @@
 namespace Okaufmann\LaravelNotificationLog\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Okaufmann\LaravelNotificationLog\LaravelNotificationLogServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {

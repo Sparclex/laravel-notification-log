@@ -8,8 +8,8 @@ use Okaufmann\LaravelNotificationLog\Concerns\CompressesBody;
 
 class SentMessageLog extends Model
 {
-    use HasFactory;
     use CompressesBody;
+    use HasFactory;
 
     protected $guarded = [];
 
