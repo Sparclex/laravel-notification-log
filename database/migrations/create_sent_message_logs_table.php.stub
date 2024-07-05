@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('sent_message_logs', function (Blueprint $table) {
-            $table->ulid();
+            $table->ulid('id');
 
             $table->string('message_id');
             $table->json('mailable')->nullable();

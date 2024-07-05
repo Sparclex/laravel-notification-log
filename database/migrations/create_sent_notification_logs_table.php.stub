@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('sent_notification_logs', function (Blueprint $table) {
-            $table->ulid();
+            $table->ulid('id');
 
             $table->string('notification_id');
             $table->string('notification')->nullable();
