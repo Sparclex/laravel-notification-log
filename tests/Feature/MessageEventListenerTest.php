@@ -7,7 +7,7 @@ use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
 
 use function Pest\Laravel\assertDatabaseCount;
 
-it('can does not log a sending notification message when disabled in configuration', function () {
+it('does not log a sending notification message when disabled in configuration', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
     $listener = new MessageEventListener();
@@ -18,7 +18,7 @@ it('can does not log a sending notification message when disabled in configurati
     assertDatabaseCount('sent_notification_logs', 1);
 });
 
-it('can does log a sending notification event when enabled in configuration', function () {
+it('does log a sending notification event when enabled in configuration', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
     $listener = new MessageEventListener();
