@@ -1,10 +1,10 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Models;
+namespace Okaufmann\LaravelNotificationLog\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Teamnovu\LaravelNotificationLog\Concerns\CompressesBody;
+use Okaufmann\LaravelNotificationLog\Concerns\CompressesBody;
 
 class SentMessageLog extends Model
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Loggers;
+namespace Okaufmann\LaravelNotificationLog\Loggers;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -12,9 +12,9 @@ use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
-use Teamnovu\LaravelNotificationLog\Contracts\ShouldLogNotification;
-use Teamnovu\LaravelNotificationLog\Models\SentNotificationLog;
-use Teamnovu\LaravelNotificationLog\NotificationFailed;
+use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
+use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
+use Okaufmann\LaravelNotificationLog\NotificationFailed;
 
 class SentNotificationLogger
 {

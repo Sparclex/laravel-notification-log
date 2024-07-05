@@ -1,6 +1,6 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Tests\Support;
+namespace Okaufmann\LaravelNotificationLog\Tests\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;

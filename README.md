@@ -1,9 +1,9 @@
 # Laravel Notification Log
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/teamnovu/laravel-notification-log.svg?style=flat-square)](https://packagist.org/packages/teamnovu/laravel-notification-log)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/teamnovu/laravel-notification-log/run-tests?label=tests)](https://github.com/teamnovu/laravel-notification-log/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/teamnovu/laravel-notification-log/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/teamnovu/laravel-notification-log/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/teamnovu/laravel-notification-log.svg?style=flat-square)](https://packagist.org/packages/teamnovu/laravel-notification-log)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/okaufmann/laravel-notification-log.svg?style=flat-square)](https://packagist.org/packages/okaufmann/laravel-notification-log)
+[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/okaufmann/laravel-notification-log/run-tests?label=tests)](https://github.com/okaufmann/laravel-notification-log/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/okaufmann/laravel-notification-log/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/okaufmann/laravel-notification-log/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/okaufmann/laravel-notification-log.svg?style=flat-square)](https://packagist.org/packages/okaufmann/laravel-notification-log)
 
 Logs every sent Notification and Mail of your entire Laravel Project.
 
@@ -12,7 +12,7 @@ Logs every sent Notification and Mail of your entire Laravel Project.
 You can install the package via composer:
 
 ```bash
-composer require teamnovu/laravel-notification-log
+composer require okaufmann/laravel-notification-log
 ```
 
 You can publish and run the migrations with:
@@ -66,8 +66,8 @@ return [
 Add the following Interface and Trait to your Notification:
 
 ```php
-use Teamnovu\LaravelNotificationLog\Concerns\LogNotification;
-use Teamnovu\LaravelNotificationLog\Contracts\ShouldLogNotification;
+use Okaufmann\LaravelNotificationLog\Concerns\LogNotification;
+use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 
 class DummyNotification extends Notification implements ShouldLogNotification
 {
@@ -97,7 +97,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Credits
 
-- [Oliver Kaufmann](https://github.com/teamnovu)
+- [Oliver Kaufmann](https://github.com/okaufmann)
 - [All Contributors](../../contributors)
 
 ## License

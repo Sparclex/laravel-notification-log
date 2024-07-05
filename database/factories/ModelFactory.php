@@ -1,6 +1,6 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Database\Factories;
+namespace Okaufmann\LaravelNotificationLog\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Casts;
+namespace Okaufmann\LaravelNotificationLog\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 

@@ -3,10 +3,10 @@
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Arr;
-use Teamnovu\LaravelNotificationLog\Loggers\SentNotificationLogger;
-use Teamnovu\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
-use Teamnovu\LaravelNotificationLog\Tests\Support\DummyNotifiable;
-use Teamnovu\LaravelNotificationLog\Tests\Support\DummyNotification;
+use Okaufmann\LaravelNotificationLog\Loggers\SentNotificationLogger;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;

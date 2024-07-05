@@ -1,11 +1,11 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Tests\Support;
+namespace Okaufmann\LaravelNotificationLog\Tests\Support;
 
 use Illuminate\Notifications\Notification;
 use Ramsey\Uuid\Uuid;
-use Teamnovu\LaravelNotificationLog\Concerns\LogNotification;
-use Teamnovu\LaravelNotificationLog\Contracts\ShouldLogNotification;
+use Okaufmann\LaravelNotificationLog\Concerns\LogNotification;
+use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 
 class DummyNotification extends Notification implements ShouldLogNotification
 {

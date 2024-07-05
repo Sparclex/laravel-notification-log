@@ -1,10 +1,10 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Commands;
+namespace Okaufmann\LaravelNotificationLog\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
-use Teamnovu\LaravelNotificationLog\Models\SentMessageLog;
+use Okaufmann\LaravelNotificationLog\Models\SentMessageLog;
 
 class DecompressAllMessages extends Command
 {

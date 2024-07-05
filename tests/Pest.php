@@ -1,5 +1,5 @@
 <?php
 
-use Teamnovu\LaravelNotificationLog\Tests\TestCase;
+use Okaufmann\LaravelNotificationLog\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__.'/Feature');

@@ -1,6 +1,6 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog;
+namespace Okaufmann\LaravelNotificationLog;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;

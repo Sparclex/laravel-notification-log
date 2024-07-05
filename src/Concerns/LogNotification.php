@@ -1,6 +1,6 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Concerns;
+namespace Okaufmann\LaravelNotificationLog\Concerns;
 
 trait LogNotification
 {

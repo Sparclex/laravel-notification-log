@@ -1,10 +1,10 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Tests;
+namespace Okaufmann\LaravelNotificationLog\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Teamnovu\LaravelNotificationLog\LaravelNotificationLogServiceProvider;
+use Okaufmann\LaravelNotificationLog\LaravelNotificationLogServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -13,7 +13,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Teamnovu\\LaravelNotificationLog\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'okaufmannn\\LaravelNotificationLog\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
 
         $this->setupDatabase();

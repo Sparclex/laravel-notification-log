@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Notifications\Events\NotificationSending;
-use Teamnovu\LaravelNotificationLog\Listeners\MessageEventListener;
-use Teamnovu\LaravelNotificationLog\Tests\Support\DummyNotifiable;
-use Teamnovu\LaravelNotificationLog\Tests\Support\DummyNotification;
+use Okaufmann\LaravelNotificationLog\Listeners\MessageEventListener;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
 
 use function Pest\Laravel\assertDatabaseCount;
 

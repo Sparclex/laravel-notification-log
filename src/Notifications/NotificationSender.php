@@ -1,9 +1,9 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Notifications;
+namespace Okaufmann\LaravelNotificationLog\Notifications;
 
 use Illuminate\Notifications\NotificationSender as BaseNotificationSender;
-use Teamnovu\LaravelNotificationLog\NotificationFailed;
+use Okaufmann\LaravelNotificationLog\NotificationFailed;
 use Throwable;
 
 class NotificationSender extends BaseNotificationSender

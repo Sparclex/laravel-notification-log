@@ -1,6 +1,6 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Contracts;
+namespace Okaufmann\LaravelNotificationLog\Contracts;
 
 interface ShouldLogNotification
 {

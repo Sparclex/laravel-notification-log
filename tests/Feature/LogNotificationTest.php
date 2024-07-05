@@ -1,6 +1,6 @@
 <?php
 
-use Teamnovu\LaravelNotificationLog\Tests\Support\DummyNotification;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
 
 it('can get the current attempt', function () {
     $notification = new DummyNotification();

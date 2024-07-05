@@ -1,8 +1,8 @@
 <?php
 
-namespace Teamnovu\LaravelNotificationLog\Concerns;
+namespace Okaufmann\LaravelNotificationLog\Concerns;
 
-use Teamnovu\LaravelNotificationLog\Casts\CompressedText;
+use Okaufmann\LaravelNotificationLog\Casts\CompressedText;
 
 trait CompressesBody
 {
