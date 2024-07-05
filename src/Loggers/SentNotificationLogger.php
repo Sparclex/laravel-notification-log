@@ -25,7 +25,7 @@ class SentNotificationLogger
         }
 
         $currentAttempt = SentNotificationLog::query()
-            ->where('notification_id', $event->notification->id)
+            ->where('notification_id', $this->getNotificationId($event))
             ->where('channel', $event->channel)
             ->max('attempt');
 
@@ -40,7 +40,7 @@ class SentNotificationLogger
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
-            'notification_id' => $event->notification->id,
+            'notification_id' => $this->getNotificationId($event),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
@@ -62,7 +62,7 @@ class SentNotificationLogger
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
-            'notification_id' => $event->notification->id,
+            'notification_id' => $this->getNotificationId($event),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
@@ -84,7 +84,7 @@ class SentNotificationLogger
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
-            'notification_id' => $event->notification->id,
+            'notification_id' => $this->getNotificationId($event),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
@@ -190,5 +190,14 @@ class SentNotificationLogger
         }
 
         return json_encode($response);
+    }
+
+    protected function getNotificationId(NotificationFailed|NotificationSent|NotificationSending $event): string
+    {
+        if (property_exists($event->notification, 'id')) {
+            return $event->notification->id;
+        }
+
+        return md5(serialize($event->notification));
     }
 }
