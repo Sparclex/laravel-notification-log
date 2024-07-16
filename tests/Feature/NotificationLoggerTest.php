@@ -60,8 +60,8 @@ it('can update a notification once it is sent', function () {
 
     $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
 
-    assertDatabaseCount('sent_notification_logs', 1);
-    assertDatabaseHas('sent_notification_logs', [
+    assertDatabaseCount('notification_logs_sent_notifications', 1);
+    assertDatabaseHas('notification_logs_sent_notifications', [
         'notification_id' => $notification->id,
         'notification_type' => get_class($notification),
         'notifiable_id' => $notifiable->getKey(),
@@ -84,8 +84,8 @@ it('can log a failed notification', function () {
     } catch (\Exception $e) {
     }
 
-    assertDatabaseCount('sent_notification_logs', 1);
-    assertDatabaseHas('sent_notification_logs', [
+    assertDatabaseCount('notification_logs_sent_notifications', 1);
+    assertDatabaseHas('notification_logs_sent_notifications', [
         'notification_id' => $notification->id,
         'notification_type' => get_class($notification),
         'notifiable_id' => $notifiable->getKey(),

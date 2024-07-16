@@ -15,7 +15,7 @@ it('does not log a sending notification message when disabled in configuration',
     config(['notification-log.resolve-notification-message' => false]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
-    assertDatabaseCount('sent_notification_logs', 1);
+    assertDatabaseCount('notification_logs_sent_notifications', 1);
 });
 
 it('does log a sending notification event when enabled in configuration', function () {
@@ -26,5 +26,5 @@ it('does log a sending notification event when enabled in configuration', functi
     config(['notification-log.resolve-notification-message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
-    assertDatabaseCount('sent_notification_logs', 1);
+    assertDatabaseCount('notification_logs_sent_notifications', 1);
 });
