@@ -44,6 +44,7 @@ class SentNotificationLogger
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
+            'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
             'notification' => get_class($event->notification),
             'notifiable' => $this->formatNotifiable($event->notifiable),
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
@@ -66,6 +67,7 @@ class SentNotificationLogger
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
+            'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
             'notification' => get_class($event->notification),
             'notifiable' => $this->formatNotifiable($event->notifiable),
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
@@ -88,6 +90,7 @@ class SentNotificationLogger
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
+            'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
             'response' => $event->exception,
             'status' => 'error',
         ]);
@@ -155,6 +158,15 @@ class SentNotificationLogger
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    public function getFingerprintForNotification(Notification $notification, $notifiable)
+    {
+        if (method_exists($notification, 'fingerprint')) {
+            return $notification->fingerprint($notifiable);
+        }
+
+        return null;
     }
 
     /**

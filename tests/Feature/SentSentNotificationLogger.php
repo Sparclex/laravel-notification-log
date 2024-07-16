@@ -7,6 +7,7 @@ use Okaufmann\LaravelNotificationLog\Loggers\SentNotificationLogger;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationWithFingerprint;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -92,4 +93,15 @@ it('can log a failed notification', function () {
         'response' => $e,
         'attempt' => 1,
     ]);
+});
+
+it('can log a sent notification with fingerprint event', function () {
+    $notifiable = new DummyNotifiable();
+    $notification = new DummyNotificationWithFingerprint();
+
+    $logger = new SentNotificationLogger();
+    config(['notification-log.resolve-notification-message' => true]);
+    $log = $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database'));
+
+    expect($log->fingerprint)->toBe("dummy-fingerprint-{$notification->id}");
 });
