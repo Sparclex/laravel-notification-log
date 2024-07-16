@@ -7,7 +7,6 @@ use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
-use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationWithFingerprint;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -22,6 +21,7 @@ it('can log a sending notification event', function () {
 
     expect($log->notification_id)->toBe($notification->id);
     expect($log->notification)->toBe(get_class($notification));
+    expect($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id);
     expect($log->notifiable)->toBe(get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())));
     expect($log->queued)->toBeFalse();
     expect($log->channel)->toBe('database');
@@ -41,6 +41,7 @@ it('can log a sending notification without message when disabled', function () {
     expect($log->notification_id)->toBe($notification->id);
     expect($log->notification)->toBe(get_class($notification));
     expect($log->notifiable)->toBe(get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())));
+    expect($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id);
     expect($log->queued)->toBeFalse();
     expect($log->channel)->toBe('database');
     expect($log->message)->toBe(null);
@@ -93,15 +94,4 @@ it('can log a failed notification', function () {
         'response' => $e,
         'attempt' => 1,
     ]);
-});
-
-it('can log a sent notification with fingerprint event', function () {
-    $notifiable = new DummyNotifiable();
-    $notification = new DummyNotificationWithFingerprint();
-
-    $logger = new NotificationLogger();
-    config(['notification-log.resolve-notification-message' => true]);
-    $log = $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database'));
-
-    expect($log->fingerprint)->toBe("dummy-fingerprint-{$notification->id}");
 });

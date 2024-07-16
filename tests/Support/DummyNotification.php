@@ -27,4 +27,9 @@ class DummyNotification extends Notification implements ShouldLogNotification
             'message' => 'This is just a example message.',
         ];
     }
+
+    public function fingerprint($notifiable)
+    {
+        return "dummy-fingerprint-{$this->id}";
+    }
 }
