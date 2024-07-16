@@ -27,4 +27,16 @@ return [
     */
 
     'resolve-notification-message' => env('NOTIFICATION_LOG_RESOLVE_NOTIFICATION_MESSAGE', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prune After Days
+    |--------------------------------------------------------------------------
+    |
+    | Defines the number of days after which old log entries will be pruned
+    | from the database to manage the size of the log table.
+    |
+    */
+
+    'prune_after_days' => 180,
 ];

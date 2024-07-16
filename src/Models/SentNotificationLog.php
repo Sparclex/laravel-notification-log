@@ -2,8 +2,11 @@
 
 namespace Okaufmann\LaravelNotificationLog\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -18,10 +21,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $queued
  * @property array $message
  * @property string $status
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class SentNotificationLog extends Model
 {
     use HasUlids;
+    use MassPrunable;
+
     protected $table = 'notification_logs_sent_notifications';
 
     protected $guarded = [];
@@ -30,4 +37,11 @@ class SentNotificationLog extends Model
         'queued' => 'boolean',
         'message' => 'json',
     ];
+
+    public function prunable(): Builder
+    {
+        $threshold = config('notification-log.prune_after_days');
+
+        return static::where('created_at', '<=', now()->subDays($threshold));
+    }
 }
