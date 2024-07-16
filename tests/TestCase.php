@@ -3,6 +3,8 @@
 namespace Okaufmann\LaravelNotificationLog\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Okaufmann\LaravelNotificationLog\LaravelNotificationLogServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -13,7 +15,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'okaufmannn\\LaravelNotificationLog\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Okaufmann\\LaravelNotificationLog\\Tests\\Support\\Factories\\'.class_basename($modelName).'Factory'
         );
 
         $this->setupDatabase();
@@ -52,5 +54,14 @@ class TestCase extends Orchestra
         $sentNotificationLogsTableMigration = require __DIR__.'/../database/migrations/create_notification_logs_sent_notifications_table.php.stub';
 
         $sentNotificationLogsTableMigration->up();
+
+        Schema::create('test_users', function (Blueprint $table) {
+            $table->id();
+
+            $table->string('email');
+            $table->string('password');
+
+            $table->timestamps();
+        });
     }
 }

@@ -4,11 +4,11 @@ namespace Okaufmann\LaravelNotificationLog\Tests\Support;
 
 use Illuminate\Notifications\Notification;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
-use Okaufmann\LaravelNotificationLog\Models\Concerns\LogNotification;
+use Okaufmann\LaravelNotificationLog\Models\Concerns\LogsNotifications;
 
 class DummyFailingNotification extends Notification implements ShouldLogNotification
 {
-    use LogNotification;
+    use LogsNotifications;
 
     public function __construct()
     {

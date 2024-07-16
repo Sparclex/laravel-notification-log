@@ -4,9 +4,11 @@ namespace Okaufmann\LaravelNotificationLog\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 
 /**
@@ -27,6 +29,7 @@ use Illuminate\Support\Carbon;
  */
 class SentNotificationLog extends Model
 {
+    use HasFactory;
     use HasUlids;
     use MassPrunable;
 
@@ -50,5 +53,44 @@ class SentNotificationLog extends Model
     public function notifiable(): MorphTo
     {
         return $this->morphTo('notifiable');
+    }
+
+    public static function latestFor(
+        $notifiable,
+        ?string $fingerprint = null,
+        string|array|null $notificationType = null,
+        ?Carbon $before = null,
+        ?Carbon $after = null,
+        string|array|null $channel = null,
+    ): ?self {
+        return self::latestForQuery(...func_get_args())->first();
+    }
+
+    public static function latestForQuery(
+        $notifiable,
+        ?string $fingerprint = null,
+        string|array|null $notificationType = null,
+        ?Carbon $before = null,
+        ?Carbon $after = null,
+        string|array|null $channel = null,
+    ): Builder {
+        return self::query()
+            ->where('notifiable_type', $notifiable->getMorphClass())
+            ->where('notifiable_id', $notifiable->getKey())
+            ->when($fingerprint, fn (Builder $query) => $query->where('fingerprint', $fingerprint))
+            ->when($notificationType, function (Builder $query) use ($notificationType) {
+                $query->whereIn('notification_type', Arr::wrap($notificationType));
+            })
+            ->when($channel, function (Builder $query) use ($channel) {
+                $query->whereIn('channel', Arr::wrap($channel));
+            })
+            ->when($before, function (Builder $query) use ($before) {
+                $query->where('created_at', '<', $before->toDateTimeString());
+            })
+            ->when($after, function (Builder $query) use ($after) {
+                $query->where('created_at', '>', $after->toDateTimeString());
+            })
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
     }
 }

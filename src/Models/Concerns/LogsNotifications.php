@@ -2,7 +2,7 @@
 
 namespace Okaufmann\LaravelNotificationLog\Models\Concerns;
 
-trait LogNotification
+trait LogsNotifications
 {
     public static $attempt = [];
 
