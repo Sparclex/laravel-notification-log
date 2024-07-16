@@ -93,5 +93,4 @@ class MessageLogger
 
         return $event->data['__laravel_notification_log_queued'] ?? false;
     }
-
 }
