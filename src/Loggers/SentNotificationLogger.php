@@ -25,7 +25,7 @@ class SentNotificationLogger
         }
 
         $currentAttempt = SentNotificationLog::query()
-            ->where('notification_id', $this->getNotificationId($event))
+            ->where('notification_id', $this->getNotificationId($event->notification))
             ->where('channel', $event->channel)
             ->max('attempt');
 
@@ -40,7 +40,7 @@ class SentNotificationLogger
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
-            'notification_id' => $this->getNotificationId($event),
+            'notification_id' => $this->getNotificationId($event->notification),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
@@ -63,7 +63,7 @@ class SentNotificationLogger
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
-            'notification_id' => $this->getNotificationId($event),
+            'notification_id' => $this->getNotificationId($event->notification),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
@@ -86,7 +86,7 @@ class SentNotificationLogger
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
-            'notification_id' => $this->getNotificationId($event),
+            'notification_id' => $this->getNotificationId($event->notification),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
@@ -174,7 +174,7 @@ class SentNotificationLogger
      *
      * @param  mixed  $notifiable
      */
-    private function formatNotifiable($notifiable): string
+    protected function formatNotifiable($notifiable): string
     {
         if ($notifiable instanceof Model) {
             return get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey()));
@@ -198,18 +198,16 @@ class SentNotificationLogger
         }
 
         if (is_object($response) && method_exists($response, 'toArray')) {
-            return json_encode($response->toArray());
         }
 
-        return json_encode($response);
     }
 
-    protected function getNotificationId(NotificationFailed|NotificationSent|NotificationSending $event): string
+    protected function getNotificationId(Notification $notification): string
     {
-        if (property_exists($event->notification, 'id')) {
-            return $event->notification->id;
+        if (property_exists($notification, 'id')) {
+            return $notification->id;
         }
 
-        return md5(serialize($event->notification));
+        return md5(serialize($notification));
     }
 }
