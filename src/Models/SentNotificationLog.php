@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 class SentNotificationLog extends Model
 {
     use HasUlids;
+    protected $table = 'notification_logs_sent_notifications';
 
     protected $guarded = [];
 

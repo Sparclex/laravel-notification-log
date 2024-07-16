@@ -16,6 +16,8 @@ class SentMessageLog extends Model
     use CompressesBody;
     use HasUlids;
 
+    protected $table = 'notification_logs_sent_messages';
+
     protected $guarded = [];
 
     protected $casts = [
