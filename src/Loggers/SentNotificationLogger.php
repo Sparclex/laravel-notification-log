@@ -198,8 +198,10 @@ class SentNotificationLogger
         }
 
         if (is_object($response) && method_exists($response, 'toArray')) {
+            return json_encode($response->toArray(), JSON_THROW_ON_ERROR);
         }
 
+        return json_encode($response, JSON_THROW_ON_ERROR);
     }
 
     protected function getNotificationId(Notification $notification): string
