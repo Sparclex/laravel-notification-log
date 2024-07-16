@@ -10,7 +10,7 @@ class InvalidNotifiable extends Exception
 {
     public static function shouldBeAModel(): self
     {
-        return new static('The notifiable should be a model.');
+        return new self('The notifiable should be a model.');
     }
 
     public static function shouldUseTrait(Model $model): self
@@ -18,6 +18,6 @@ class InvalidNotifiable extends Exception
         $modelClass = $model::class;
         $trait = HasNotifiableHistory::class;
 
-        return new static("The `{$modelClass}` model should use the `{$trait}`.");
+        return new self("The `{$modelClass}` model should use the `{$trait}`.");
     }
 }
