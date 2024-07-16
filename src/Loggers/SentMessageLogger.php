@@ -18,7 +18,6 @@ class SentMessageLogger
             'message_id' => $event->sent->getMessageId(),
         ],
             [
-
                 'mailable' => $this->getMailable($event),
                 'queued' => $this->getQueuedStatus($event),
                 'to' => $this->listAddresses($event->message->getTo()),
@@ -44,9 +43,8 @@ class SentMessageLogger
     {
         return collect($addresses)
             ->filter()
-            ->map(function (Address $address) {
-                return $address->getName() ? "{$address->getName()} <{$address->getAddress()}>" : $address->getAddress();
-            })->values()
+            ->map(fn (Address $address) => $address->getName() ? "{$address->getName()} <{$address->getAddress()}>" : $address->getAddress())
+            ->values()
             ->toArray();
     }
 
@@ -66,9 +64,7 @@ class SentMessageLogger
     protected function listAttachments(array $getAttachments): array
     {
         return collect($getAttachments)
-            ->map(function (DataPart $attachment) {
-                return $attachment->getFilename();
-            })
+            ->map(fn (DataPart $attachment) => $attachment->getFilename())
             ->toArray();
     }
 
