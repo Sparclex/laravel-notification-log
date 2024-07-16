@@ -36,6 +36,7 @@ class SentNotificationLog extends Model
     protected $casts = [
         'queued' => 'boolean',
         'message' => 'json',
+        'anonymous_notifiable_routes' => 'array',
     ];
 
     public function prunable(): Builder
