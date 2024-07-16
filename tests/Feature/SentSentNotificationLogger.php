@@ -25,7 +25,7 @@ it('can log a sending notification event', function () {
     expect($log->notifiable)->toBe(get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())));
     expect($log->queued)->toBeFalse();
     expect($log->channel)->toBe('database');
-    expect($log->message)->toBe(['message' => 'Consectetur culpa ex aliquip ex anim.']);
+    expect($log->message)->toBe(['message' => 'This is just a example message.']);
     expect($log->status)->toBe('sending');
     expect($log->attempt)->toBe(1);
 });
@@ -65,7 +65,7 @@ it('can update a notification once it is sent', function () {
         'notifiable' => get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())),
         'queued' => false,
         'channel' => 'database',
-        'message' => json_encode(['message' => 'Consectetur culpa ex aliquip ex anim.']),
+        'message' => json_encode(['message' => 'This is just a example message.']),
         'response' => 'dummy response',
         'status' => 'sent',
         'attempt' => 1,

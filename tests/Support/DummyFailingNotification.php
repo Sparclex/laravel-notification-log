@@ -25,7 +25,7 @@ class DummyFailingNotification extends Notification implements ShouldLogNotifica
         throw new \Exception('Notification could not be sent!');
 
         return [
-            'message' => 'Consectetur culpa ex aliquip ex anim.',
+            'message' => 'This is just a example message.',
         ];
     }
 }

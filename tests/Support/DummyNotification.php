@@ -24,7 +24,7 @@ class DummyNotification extends Notification implements ShouldLogNotification
     public function toArray($notifiable)
     {
         return [
-            'message' => 'Consectetur culpa ex aliquip ex anim.',
+            'message' => 'This is just a example message.',
         ];
     }
 }
