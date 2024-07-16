@@ -137,19 +137,12 @@ it('can find a sent notification with the same channel', function (
             'created_at' => now()->subMinutes(30),
         ]);
 
-    ds(NotificationLogItem::all());
-
     $hasHistoryCalls = function ($notifiable, $channel) {
-        $r = $this
+        return $this
             ->wasSentTo($notifiable)
             ->onChannel($channel)
             ->inThePastMinutes(60);
-
-        ds($notifiable, $channel, $r);
-
-        return $r;
     };
-    ds($hasHistoryCalls);
 
     expect(executeInNotification($hasHistoryCalls, $this->notifiable))
         ->toBe($expectedResult);
