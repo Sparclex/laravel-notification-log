@@ -2,7 +2,6 @@
 
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
-use Illuminate\Support\Arr;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
@@ -19,15 +18,16 @@ it('can log a sending notification event', function () {
     config(['notification-log.resolve-notification-message' => true]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
-    expect($log->notification_id)->toBe($notification->id);
-    expect($log->notification)->toBe(get_class($notification));
-    expect($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id);
-    expect($log->notifiable)->toBe(get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())));
-    expect($log->queued)->toBeFalse();
-    expect($log->channel)->toBe('database');
-    expect($log->message)->toBe(['message' => 'This is just a example message.']);
-    expect($log->status)->toBe('sending');
-    expect($log->attempt)->toBe(1);
+    expect($log->notification_id)->toBe($notification->id)
+        ->and($log->notification_type)->toBe(get_class($notification))
+        ->and($log->notifiable_type)->toBe(get_class($notifiable))
+        ->and($log->notifiable_id)->toBe($notifiable->getKey())
+        ->and($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id)
+        ->and($log->queued)->toBeFalse()
+        ->and($log->channel)->toBe('database')
+        ->and($log->message)->toBe(['message' => 'This is just a example message.'])
+        ->and($log->status)->toBe('sending')
+        ->and($log->attempt)->toBe(1);
 });
 
 it('can log a sending notification without message when disabled', function () {
@@ -38,15 +38,16 @@ it('can log a sending notification without message when disabled', function () {
     config(['notification-log.resolve-notification-message' => false]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
-    expect($log->notification_id)->toBe($notification->id);
-    expect($log->notification)->toBe(get_class($notification));
-    expect($log->notifiable)->toBe(get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())));
-    expect($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id);
-    expect($log->queued)->toBeFalse();
-    expect($log->channel)->toBe('database');
-    expect($log->message)->toBe(null);
-    expect($log->status)->toBe('sending');
-    expect($log->attempt)->toBe(1);
+    expect($log->notification_id)->toBe($notification->id)
+        ->and($log->notification_type)->toBe(get_class($notification))
+        ->and($log->notifiable_type)->toBe(get_class($notifiable))
+        ->and($log->notifiable_id)->toBe($notifiable->getKey())
+        ->and($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id)
+        ->and($log->queued)->toBeFalse()
+        ->and($log->channel)->toBe('database')
+        ->and($log->message)->toBe(null)
+        ->and($log->status)->toBe('sending')
+        ->and($log->attempt)->toBe(1);
 });
 
 it('can update a notification once it is sent', function () {
@@ -62,8 +63,9 @@ it('can update a notification once it is sent', function () {
     assertDatabaseCount('sent_notification_logs', 1);
     assertDatabaseHas('sent_notification_logs', [
         'notification_id' => $notification->id,
-        'notification' => get_class($notification),
-        'notifiable' => get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())),
+        'notification_type' => get_class($notification),
+        'notifiable_id' => $notifiable->getKey(),
+        'notifiable_type' => get_class($notifiable),
         'queued' => false,
         'channel' => 'database',
         'message' => json_encode(['message' => 'This is just a example message.']),
@@ -85,8 +87,9 @@ it('can log a failed notification', function () {
     assertDatabaseCount('sent_notification_logs', 1);
     assertDatabaseHas('sent_notification_logs', [
         'notification_id' => $notification->id,
-        'notification' => get_class($notification),
-        'notifiable' => get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey())),
+        'notification_type' => get_class($notification),
+        'notifiable_id' => $notifiable->getKey(),
+        'notifiable_type' => get_class($notifiable),
         'queued' => false,
         'channel' => 'database',
         'message' => null,

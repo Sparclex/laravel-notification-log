@@ -41,12 +41,14 @@ class NotificationLogger
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
+            'notification_type' => $this->getNotificationType($event),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
+            'notifiable_type' => $this->getNotifiableType($event),
+            'notifiable_id' => $this->getNotifiableKey($event),
+            'anonymous_notifiable_routes' => $this->getAnonymousRoutes($event),
             'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
-            'notification' => get_class($event->notification),
-            'notifiable' => $this->formatNotifiable($event->notifiable),
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
             'status' => 'sending',
@@ -64,13 +66,10 @@ class NotificationLogger
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
+            'notification_type' => $this->getNotificationType($event),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
-            'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
-            'notification' => get_class($event->notification),
-            'notifiable' => $this->formatNotifiable($event->notifiable),
-            'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
             'response' => $this->formatResponse($event->response),
             'status' => 'sent',
         ]);
@@ -87,10 +86,10 @@ class NotificationLogger
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
+            'notification_type' => $this->getNotificationType($event),
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
-            'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
             'response' => $event->exception,
             'status' => 'error',
         ]);
@@ -107,13 +106,12 @@ class NotificationLogger
         $channelManager = resolve(ChannelManager::class);
         $channel = $channelManager->driver($channel);
 
-        // we never want to save the mail message here, as it will be logged by the sent mail logger.
+        // we never want to save the mail message here, as it will be logged by the mail logger.
         if ($channel instanceof MailChannel) {
             return null;
         }
 
         try {
-            // it the only channel anonymous notifiables are used
             if ($channel instanceof \Illuminate\Notifications\Channels\VonageSmsChannel) {
                 $message = $notification->toVonage($notifiable);
 
@@ -122,10 +120,6 @@ class NotificationLogger
                 }
 
                 return $message->content;
-            }
-
-            if ($notifiable instanceof AnonymousNotifiable) {
-                return null;
             }
 
             if ($channel instanceof \NotificationChannels\Telegram\TelegramChannel) {
@@ -141,6 +135,10 @@ class NotificationLogger
                 $message = $notification->toWebPush($notifiable, $notification);
 
                 return $message->toArray();
+            }
+
+            if ($notifiable instanceof AnonymousNotifiable) {
+                return null;
             }
 
             if ($channel instanceof DatabaseChannel) {
@@ -167,6 +165,51 @@ class NotificationLogger
         }
 
         return null;
+    }
+
+    protected function getNotifiableType(NotificationSending $event): ?string
+    {
+        /** @var Model|AnonymousNotifiable $notifiable */
+        $notifiable = $event->notifiable;
+
+        return $notifiable instanceof Model
+            ? $notifiable->getMorphClass()
+            : null;
+    }
+
+    protected function getNotifiableKey(NotificationSending $event): mixed
+    {
+        /** @var Model|AnonymousNotifiable $notifiable */
+        $notifiable = $event->notifiable;
+
+        return $notifiable instanceof Model
+            ? $notifiable->getKey()
+            : null;
+    }
+
+    protected function getNotificationType(NotificationSending|NotificationSent|NotificationFailed $event): string
+    {
+        $notification = $event->notification;
+
+        return $this->getNotificationTypeForNotification($notification, $event->notifiable);
+    }
+
+    public function getNotificationTypeForNotification(Notification $notification, $notifiable)
+    {
+        if (method_exists($notification, 'logType')) {
+            return $notification->logType($notifiable);
+        }
+
+        return get_class($notification);
+    }
+
+    protected function getAnonymousRoutes(NotificationSending $event): ?array
+    {
+        if (! $event->notifiable instanceof AnonymousNotifiable) {
+            return null;
+        }
+
+        return $event->notifiable->routes;
     }
 
     /**
