@@ -4,6 +4,7 @@ namespace Okaufmann\LaravelNotificationLog\Notifications;
 
 use Illuminate\Notifications\NotificationSender as BaseNotificationSender;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
+use Override;
 use Throwable;
 
 class NotificationSender extends BaseNotificationSender
@@ -17,6 +18,7 @@ class NotificationSender extends BaseNotificationSender
      * @param  string  $channel
      * @return void
      */
+    #[Override]
     protected function sendToNotifiable($notifiable, $id, $notification, $channel)
     {
         try {

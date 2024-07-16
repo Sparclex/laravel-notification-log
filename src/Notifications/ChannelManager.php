@@ -5,6 +5,7 @@ namespace Okaufmann\LaravelNotificationLog\Notifications;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\ChannelManager as BaseChannelManager;
+use Override;
 
 class ChannelManager extends BaseChannelManager
 {
@@ -15,6 +16,7 @@ class ChannelManager extends BaseChannelManager
      * @param  mixed  $notification
      * @return void
      */
+    #[Override]
     public function send($notifiables, $notification)
     {
         (new NotificationSender(
@@ -29,6 +31,7 @@ class ChannelManager extends BaseChannelManager
      * @param  mixed  $notification
      * @return void
      */
+    #[Override]
     public function sendNow($notifiables, $notification, ?array $channels = null)
     {
         (new NotificationSender(
