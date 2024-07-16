@@ -6,14 +6,12 @@ use Okaufmann\LaravelNotificationLog\Casts\CompressedText;
 
 trait CompressesBody
 {
-    public function getCasts()
+    public function initializeCompressBody()
     {
         if (config('notification-log.compress-messages', false)) {
-            return array_merge($this->casts, [
+            $this->mergeCasts([
                 'body' => CompressedText::class,
             ]);
         }
-
-        return parent::getCasts();
     }
 }
