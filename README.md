@@ -67,8 +67,7 @@ return [
 Add the following Interface and Trait to your Notification:
 
 ```php
-use Okaufmann\LaravelNotificationLog\Concerns\LogNotification;
-use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
+use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;use Okaufmann\LaravelNotificationLog\Models\Concerns\LogNotification;
 
 class DummyNotification extends Notification implements ShouldLogNotification
 {

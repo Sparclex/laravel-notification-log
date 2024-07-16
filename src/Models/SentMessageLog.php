@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Okaufmann\LaravelNotificationLog\Concerns\CompressesBody;
+use Okaufmann\LaravelNotificationLog\Models\Concerns\CompressesBody;
 
 /**
  * @property string $id

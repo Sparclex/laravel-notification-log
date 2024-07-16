@@ -3,8 +3,8 @@
 namespace Okaufmann\LaravelNotificationLog\Tests\Support;
 
 use Illuminate\Notifications\Notification;
-use Okaufmann\LaravelNotificationLog\Concerns\LogNotification;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
+use Okaufmann\LaravelNotificationLog\Models\Concerns\LogNotification;
 use Ramsey\Uuid\Uuid;
 
 class DummyNotification extends Notification implements ShouldLogNotification

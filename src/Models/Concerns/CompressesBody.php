@@ -1,6 +1,6 @@
 <?php
 
-namespace Okaufmann\LaravelNotificationLog\Concerns;
+namespace Okaufmann\LaravelNotificationLog\Models\Concerns;
 
 use Okaufmann\LaravelNotificationLog\Casts\CompressedText;
 
