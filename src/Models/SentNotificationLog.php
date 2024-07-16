@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property string $id
  * @property string $notification_id
- * @property string $notification
+ * @property string $notification_type
+ * @property string $notifiable_id
+ * @property string $notifiable_type
+ * @property string $fingerprint
  * @property string $channel
  * @property int $attempt
  * @property array $notifiable
