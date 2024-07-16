@@ -9,7 +9,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
 
-class SentMessageLogger
+class MessageLogger
 {
     public function logSentMessage(MessageSent $event)
     {
@@ -93,4 +93,5 @@ class SentMessageLogger
 
         return $event->data['__laravel_notification_log_queued'] ?? false;
     }
+
 }

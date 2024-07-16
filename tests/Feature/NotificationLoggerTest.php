@@ -3,7 +3,7 @@
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Arr;
-use Okaufmann\LaravelNotificationLog\Loggers\SentNotificationLogger;
+use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
@@ -16,7 +16,7 @@ it('can log a sending notification event', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
 
-    $logger = new SentNotificationLogger();
+    $logger = new NotificationLogger();
     config(['notification-log.resolve-notification-message' => true]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
@@ -34,7 +34,7 @@ it('can log a sending notification without message when disabled', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
 
-    $logger = new SentNotificationLogger();
+    $logger = new NotificationLogger();
     config(['notification-log.resolve-notification-message' => false]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
@@ -52,7 +52,7 @@ it('can update a notification once it is sent', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
 
-    $logger = new SentNotificationLogger();
+    $logger = new NotificationLogger();
     config(['notification-log.resolve-notification-message' => true]);
     $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
@@ -99,7 +99,7 @@ it('can log a sent notification with fingerprint event', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotificationWithFingerprint();
 
-    $logger = new SentNotificationLogger();
+    $logger = new NotificationLogger();
     config(['notification-log.resolve-notification-message' => true]);
     $log = $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database'));
 

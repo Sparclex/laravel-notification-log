@@ -16,7 +16,7 @@ use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 
-class SentNotificationLogger
+class NotificationLogger
 {
     public function logSendingNotification(NotificationSending $event): ?SentNotificationLog
     {
