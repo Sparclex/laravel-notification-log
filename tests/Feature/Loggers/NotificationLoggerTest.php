@@ -98,3 +98,26 @@ it('can log a failed notification', function () {
         'attempt' => 1,
     ]);
 });
+
+it('can log a notification sent to a anonymous notifiable', function () {
+    $notifiable = new \Illuminate\Notifications\AnonymousNotifiable();
+    $route = fake()->safeEmail();
+    $notifiable->route('mail', $route);
+    $notification = new DummyNotification();
+
+    $logger = new NotificationLogger();
+    config(['notification-log.resolve-notification-message' => true]);
+    $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'mail'));
+
+    expect($log->notification_id)->toBe($notification->id)
+        ->and($log->notification_type)->toBe(DummyNotification::class)
+        ->and($log->notifiable_type)->toBeNull()
+        ->and($log->notifiable_id)->toBeNull()
+        ->and($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id)
+        ->and($log->anonymous_notifiable_routes)->toBe(['mail' => $route])
+        ->and($log->queued)->toBeFalse()
+        ->and($log->channel)->toBe('mail')
+        ->and($log->message)->toBeNull()
+        ->and($log->status)->toBe('sending')
+        ->and($log->attempt)->toBe(1);
+});

@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $notification_type
  * @property string $notifiable_id
  * @property string $notifiable_type
+ * @property array $anonymous_notifiable_routes
  * @property string $fingerprint
  * @property string $channel
  * @property int $attempt

@@ -137,10 +137,6 @@ class NotificationLogger
                 return $message->toArray();
             }
 
-            if ($notifiable instanceof AnonymousNotifiable) {
-                return null;
-            }
-
             if ($channel instanceof DatabaseChannel) {
                 if (method_exists($notification, 'toDatabase')) {
                     return is_array($data = $notification->toDatabase($notifiable))
