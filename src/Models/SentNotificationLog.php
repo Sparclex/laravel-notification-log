@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
 
 /**
@@ -44,5 +45,10 @@ class SentNotificationLog extends Model
         $threshold = config('notification-log.prune_after_days');
 
         return static::where('created_at', '<=', now()->subDays($threshold));
+    }
+
+    public function notifiable(): MorphTo
+    {
+        return $this->morphTo('notifiable');
     }
 }
