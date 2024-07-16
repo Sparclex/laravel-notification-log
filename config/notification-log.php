@@ -39,4 +39,17 @@ return [
     */
 
     'prune_after_days' => 180,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Log All By Default
+    |--------------------------------------------------------------------------
+    |
+    | If enabled, all notifications will be logged by default unless explicitly
+    | excluded. This can help ensure that all notifications are tracked for
+    | debugging and auditing purposes.
+    |
+    */
+
+    'log_all_by_default' => false,
 ];
