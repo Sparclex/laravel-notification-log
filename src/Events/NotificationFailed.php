@@ -1,6 +1,6 @@
 <?php
 
-namespace Okaufmann\LaravelNotificationLog;
+namespace Okaufmann\LaravelNotificationLog\Events;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;

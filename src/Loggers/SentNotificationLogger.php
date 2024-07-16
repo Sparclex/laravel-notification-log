@@ -13,8 +13,8 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
+use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
-use Okaufmann\LaravelNotificationLog\NotificationFailed;
 
 class SentNotificationLogger
 {

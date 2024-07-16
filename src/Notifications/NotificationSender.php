@@ -3,7 +3,7 @@
 namespace Okaufmann\LaravelNotificationLog\Notifications;
 
 use Illuminate\Notifications\NotificationSender as BaseNotificationSender;
-use Okaufmann\LaravelNotificationLog\NotificationFailed;
+use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Throwable;
 
 class NotificationSender extends BaseNotificationSender
