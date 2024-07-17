@@ -3,10 +3,10 @@
 namespace Okaufmann\LaravelNotificationLog\Listeners;
 
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Okaufmann\LaravelNotificationLog\Contracts\EnsureUniqueNotification;
-use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Loggers\MessageLogger;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 

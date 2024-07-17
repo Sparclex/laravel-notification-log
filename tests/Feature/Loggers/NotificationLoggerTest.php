@@ -95,7 +95,9 @@ it('can log a failed notification', function () {
         'channel' => 'database',
         'message' => null,
         'status' => NotificationDeliveryStatus::FAILED,
-        'response' => $e,
+        'data' => json_encode([
+            'message' => 'Notification could not be sent!',
+        ], JSON_THROW_ON_ERROR),
         'attempt' => 1,
     ]);
 });

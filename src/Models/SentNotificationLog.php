@@ -26,6 +26,7 @@ use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
  * @property bool $queued
  * @property array $message
  * @property string $status
+ * @property array $data
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -42,6 +43,7 @@ class SentNotificationLog extends Model
     protected $casts = [
         'queued' => 'boolean',
         'message' => 'json',
+        'data' => 'json',
         'anonymous_notifiable_routes' => 'array',
         'status' => NotificationDeliveryStatus::class,
     ];

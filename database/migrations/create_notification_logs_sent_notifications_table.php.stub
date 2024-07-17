@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('fingerprint')->nullable();
             $table->boolean('queued')->default(false);
             $table->string('channel')->nullable();
-            $table->text('response')->nullable();
+            $table->json('data')->nullable();
             $table->json('message')->nullable();
             $table->string('status')->nullable();
             $table->integer('attempt')->default(1);

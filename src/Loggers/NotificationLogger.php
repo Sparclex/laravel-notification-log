@@ -8,13 +8,13 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Channels\MailChannel;
+use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
-use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 
@@ -107,7 +107,7 @@ class NotificationLogger
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
-            'response' => $event->exception,
+            'data' => $event->data,
             'status' => NotificationDeliveryStatus::FAILED,
         ]);
 

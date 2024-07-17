@@ -2,8 +2,8 @@
 
 namespace Okaufmann\LaravelNotificationLog\Manager;
 
+use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\NotificationSender as BaseNotificationSender;
-use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Override;
 use Throwable;
 
@@ -25,7 +25,7 @@ class NotificationSender extends BaseNotificationSender
             parent::sendToNotifiable($notifiable, $id, $notification, $channel);
         } catch (Throwable $ex) {
             $this->events->dispatch(
-                new NotificationFailed($notifiable, $notification, $channel, $ex)
+                new NotificationFailed($notifiable, $notification, $channel, ['message' => $ex->getMessage()])
             );
 
             throw $ex;

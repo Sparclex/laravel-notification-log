@@ -23,9 +23,5 @@ class DummyFailingNotification extends Notification implements ShouldLogNotifica
     public function toArray($notifiable)
     {
         throw new \Exception('Notification could not be sent!');
-
-        return [
-            'message' => 'This is just a example message.',
-        ];
     }
 }
