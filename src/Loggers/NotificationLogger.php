@@ -139,6 +139,16 @@ class NotificationLogger
                 return $message->content;
             }
 
+            if ($channel instanceof \NotificationChannels\Twilio\TwilioChannel) {
+                $message = $notification->toTwilio($notifiable);
+
+                if (is_string($message)) {
+                    $message = new \NotificationChannels\Twilio\TwilioSmsMessage($message);
+                }
+
+                return $message->content;
+            }
+
             if ($channel instanceof \NotificationChannels\Telegram\TelegramChannel) {
                 $message = $notification->toTelegram($notifiable);
                 if (is_string($message)) {
