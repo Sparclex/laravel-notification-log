@@ -70,7 +70,7 @@ it('can update a notification once it is sent', function () {
         'queued' => false,
         'channel' => 'database',
         'message' => json_encode(['message' => 'This is just a example message.']),
-        'response' => 'dummy response',
+        'data' => json_encode(['message' => 'dummy response'], JSON_THROW_ON_ERROR),
         'status' => NotificationDeliveryStatus::SENT,
         'attempt' => 1,
     ]);

@@ -14,6 +14,7 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use JsonSerializable;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
@@ -87,7 +88,7 @@ class NotificationLogger
             'channel' => $event->channel,
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
-            'response' => $this->formatResponse($event->response),
+            'data' => $this->formatResponse($event->response),
             'status' => NotificationDeliveryStatus::SENT,
         ]);
 
@@ -257,17 +258,31 @@ class NotificationLogger
         return get_class($notifiable);
     }
 
-    protected function formatResponse($response): mixed
+    protected function formatResponse($response): ?array
     {
         if (is_string($response)) {
-            return $response;
+            return [
+                'message' => $response,
+            ];
         }
 
         if (is_object($response) && method_exists($response, 'toArray')) {
-            return json_encode($response->toArray(), JSON_THROW_ON_ERROR);
+            return $response->toArray();
         }
 
-        return json_encode($response, JSON_THROW_ON_ERROR);
+        if (is_object($response) && method_exists($response, 'toJson')) {
+            return $response->toJson();
+        }
+
+        if ($response instanceof JsonSerializable) {
+            return json_decode(json_encode($response), true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        if (is_array($response)) {
+            return $response;
+        }
+
+        return null;
     }
 
     protected function getNotificationId(Notification $notification): string
