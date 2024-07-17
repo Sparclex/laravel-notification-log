@@ -25,8 +25,8 @@ use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
  * @property array $notifiable
  * @property bool $queued
  * @property array $message
- * @property string $status
  * @property array $data
+ * @property NotificationDeliveryStatus $status
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */

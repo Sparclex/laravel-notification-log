@@ -29,8 +29,8 @@ class NotificationLogger
 
         $this->increaseNotificationAttempt($event);
 
-        /** @var SentNotificationLog $notification */
-        $notification = SentNotificationLog::updateOrCreate([
+        /** @var SentNotificationLog $sentNotificationLog */
+        $sentNotificationLog = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->normalizeChannelName($event->channel),
@@ -45,7 +45,7 @@ class NotificationLogger
             'status' => NotificationDeliveryStatus::SKIPPED,
         ]);
 
-        return $notification;
+        return $sentNotificationLog;
     }
 
     public function logSendingNotification(NotificationSending $event): ?SentNotificationLog
@@ -56,8 +56,8 @@ class NotificationLogger
 
         $this->increaseNotificationAttempt($event);
 
-        /** @var SentNotificationLog $notification */
-        $notification = SentNotificationLog::updateOrCreate([
+        /** @var SentNotificationLog $sentNotificationLog */
+        $sentNotificationLog = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->normalizeChannelName($event->channel),
@@ -72,17 +72,18 @@ class NotificationLogger
             'status' => NotificationDeliveryStatus::SENDING,
         ]);
 
-        return $notification;
+        return $sentNotificationLog;
     }
 
     public function logSentNotification(NotificationSent $event): ?SentNotificationLog
     {
+
         if (! $event->notification instanceof ShouldLogNotification) {
             return null;
         }
 
-        /** @var SentNotificationLog $notification */
-        $notification = SentNotificationLog::updateOrCreate([
+        /** @var SentNotificationLog $sentNotificationLog */
+        $sentNotificationLog = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->normalizeChannelName($event->channel),
@@ -92,7 +93,7 @@ class NotificationLogger
             'status' => NotificationDeliveryStatus::SENT,
         ]);
 
-        return $notification;
+        return $sentNotificationLog;
     }
 
     public function logFailedNotification(NotificationFailed $event): ?SentNotificationLog
@@ -101,18 +102,40 @@ class NotificationLogger
             return null;
         }
 
-        /** @var SentNotificationLog $notification */
-        $notification = SentNotificationLog::updateOrCreate([
+        // there may be the case a channel already fires a NotificationFailed event.
+        // this is the case for several channels because the implementations are very inconsistent.
+        $findData = [
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->normalizeChannelName($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
-        ], [
-            'data' => $event->data,
-            'status' => NotificationDeliveryStatus::FAILED,
-        ]);
+        ];
 
-        return $notification;
+        $notificationLog = SentNotificationLog::query()
+            ->where($findData)
+            ->first();
+
+        if (! $notificationLog) {
+            // a notification needs to at least be in status sending first.
+            // therefore it must exist in the logs table before can be declared as failed.
+            return null;
+        }
+
+        if ($notificationLog->status === NotificationDeliveryStatus::FAILED) {
+            // if the notification is already marked as failed, we won't update it again.
+            // most of the time this will be caused by the fact the channel handles failed notifications itself
+            // and our custom notification sender caught the exception and fired another FailedNotification event.
+            return $notificationLog;
+        }
+
+        $notificationLog = SentNotificationLog::updateOrCreate(
+            $findData,
+            [
+                'data' => $event->data,
+                'status' => NotificationDeliveryStatus::FAILED,
+            ]);
+
+        return $notificationLog;
     }
 
     public function resolveMessage(string $channel, Notification $notification, $notifiable)
@@ -191,6 +214,15 @@ class NotificationLogger
         return null;
     }
 
+    public function getNotificationTypeForNotification(Notification $notification, $notifiable)
+    {
+        if (method_exists($notification, 'logType')) {
+            return $notification->logType($notifiable);
+        }
+
+        return get_class($notification);
+    }
+
     public function normalizeChannelName($channel)
     {
         if (! class_exists($channel)) {
@@ -236,15 +268,6 @@ class NotificationLogger
         $notification = $event->notification;
 
         return $this->getNotificationTypeForNotification($notification, $event->notifiable);
-    }
-
-    public function getNotificationTypeForNotification(Notification $notification, $notifiable)
-    {
-        if (method_exists($notification, 'logType')) {
-            return $notification->logType($notifiable);
-        }
-
-        return get_class($notification);
     }
 
     protected function getAnonymousRoutes(NotificationSending $event): ?array

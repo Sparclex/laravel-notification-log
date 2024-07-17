@@ -7,6 +7,7 @@ use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationViaTestChannel;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -100,6 +101,34 @@ it('can log a failed notification', function () {
         ], JSON_THROW_ON_ERROR),
         'attempt' => 1,
     ]);
+});
+
+it('does not log a failed notification twice', function () {
+    $notifiable = new DummyNotifiable();
+    $notification = new DummyNotificationViaTestChannel();
+
+    try {
+        $notifiable->notify($notification);
+    } catch (\Exception $e) {
+    }
+
+    assertDatabaseCount('notification_logs_sent_notifications', 1);
+
+    assertDatabaseHas('notification_logs_sent_notifications', [
+        'notification_id' => $notification->id,
+        'notification_type' => get_class($notification),
+        'notifiable_id' => $notifiable->getKey(),
+        'notifiable_type' => get_class($notifiable),
+        'queued' => false,
+        'channel' => 'test',
+        'message' => null,
+        'status' => NotificationDeliveryStatus::FAILED,
+        'data' => json_encode([
+            'message' => 'could not send notification!',
+        ], JSON_THROW_ON_ERROR),
+        'attempt' => 1,
+    ]);
+
 });
 
 it('can log a notification sent to a anonymous notifiable', function () {
