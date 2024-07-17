@@ -18,7 +18,6 @@ class TestChannel
 
     public function send($notifiable, Notification $notification)
     {
-        ds($notifiable, $notification);
         $event = new NotificationFailed(
             $notifiable,
             $notification,
