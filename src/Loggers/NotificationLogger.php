@@ -12,37 +12,20 @@ use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
-use Okaufmann\LaravelNotificationLog\Contracts\EnsureUniqueNotification;
+use Illuminate\Support\Str;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
+use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 
 class NotificationLogger
 {
-    public function logSendingNotification(NotificationSending $event): SentNotificationLog|false|null
+    public function logSkippedNotification(NotificationSending $event): ?SentNotificationLog
     {
+        $this->increaseNotificationAttempt($event);
+
         if (! $event->notification instanceof ShouldLogNotification) {
             return null;
-        }
-
-        if ($event->notification instanceof EnsureUniqueNotification
-            && $event->notification->wasSentTo($event->notifiable, withSameFingerprint: true)->onChannel($event->channel)->inThePast()
-        ) {
-            return false;
-        }
-
-        $currentAttempt = SentNotificationLog::query()
-            ->where('notification_id', $this->getNotificationId($event->notification))
-            ->where('channel', $event->channel)
-            ->max('attempt');
-
-        // when you retry a job after it failed after several tries, the attempt of the instance will be reset as
-        // it will be pushed as a new instance with the same notification id to the queue.
-        // Therefor we need to increment the attempt manually by looking it up in the logs table.
-        if ($currentAttempt > $event->notification->getCurrentAttempt()) {
-            $event->notification->setCurrentAttempt($currentAttempt + 1);
-        } else {
-            $event->notification->setCurrentAttempt();
         }
 
         /** @var SentNotificationLog $notification */
@@ -58,7 +41,34 @@ class NotificationLogger
             'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
-            'status' => 'sending',
+            'status' => NotificationDeliveryStatus::SKIPPED,
+        ]);
+
+        return $notification;
+    }
+
+    public function logSendingNotification(NotificationSending $event): ?SentNotificationLog
+    {
+        $this->increaseNotificationAttempt($event);
+
+        if (! $event->notification instanceof ShouldLogNotification) {
+            return null;
+        }
+
+        /** @var SentNotificationLog $notification */
+        $notification = SentNotificationLog::updateOrCreate([
+            'notification_id' => $this->getNotificationId($event->notification),
+            'notification_type' => $this->getNotificationType($event),
+            'channel' => $event->channel,
+            'attempt' => $event->notification->getCurrentAttempt(),
+        ], [
+            'notifiable_type' => $this->getNotifiableType($event),
+            'notifiable_id' => $this->getNotifiableKey($event),
+            'anonymous_notifiable_routes' => $this->getAnonymousRoutes($event),
+            'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
+            'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
+            'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
+            'status' => NotificationDeliveryStatus::SENDING,
         ]);
 
         return $notification;
@@ -78,7 +88,7 @@ class NotificationLogger
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'response' => $this->formatResponse($event->response),
-            'status' => 'sent',
+            'status' => NotificationDeliveryStatus::SENT,
         ]);
 
         return $notification;
@@ -98,7 +108,7 @@ class NotificationLogger
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'response' => $event->exception,
-            'status' => 'error',
+            'status' => NotificationDeliveryStatus::FAILED,
         ]);
 
         return $notification;
@@ -252,10 +262,29 @@ class NotificationLogger
 
     protected function getNotificationId(Notification $notification): string
     {
-        if (property_exists($notification, 'id') && $notification->id !== null) {
-            return $notification->id;
+        if (! $notification->id) {
+            $notification->id = Str::uuid()->toString();
         }
 
-        return md5(serialize($notification));
+        return $notification->id;
+    }
+
+    private function increaseNotificationAttempt(NotificationSending $event): void
+    {
+        assert($event->notification instanceof ShouldLogNotification);
+
+        $currentAttempt = SentNotificationLog::query()
+            ->where('notification_id', $this->getNotificationId($event->notification))
+            ->where('channel', $event->channel)
+            ->max('attempt');
+
+        // when you retry a job after it failed after several tries, the attempt of the instance will be reset as
+        // it will be pushed as a new instance with the same notification id to the queue.
+        // Therefor we need to increment the attempt manually by looking it up in the logs table.
+        if ($currentAttempt > $event->notification->getCurrentAttempt()) {
+            $event->notification->setCurrentAttempt($currentAttempt + 1);
+        } else {
+            $event->notification->setCurrentAttempt();
+        }
     }
 }

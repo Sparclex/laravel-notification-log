@@ -3,11 +3,10 @@
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
+use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
-use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationUnique;
-use Okaufmann\LaravelNotificationLog\Tests\Support\TestUser;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -28,7 +27,7 @@ it('can log a sending notification event', function () {
         ->and($log->queued)->toBeFalse()
         ->and($log->channel)->toBe('database')
         ->and($log->message)->toBe(['message' => 'This is just a example message.'])
-        ->and($log->status)->toBe('sending')
+        ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1);
 });
 
@@ -48,7 +47,7 @@ it('can log a sending notification without message when disabled', function () {
         ->and($log->queued)->toBeFalse()
         ->and($log->channel)->toBe('database')
         ->and($log->message)->toBe(null)
-        ->and($log->status)->toBe('sending')
+        ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1);
 });
 
@@ -72,7 +71,7 @@ it('can update a notification once it is sent', function () {
         'channel' => 'database',
         'message' => json_encode(['message' => 'This is just a example message.']),
         'response' => 'dummy response',
-        'status' => 'sent',
+        'status' => NotificationDeliveryStatus::SENT,
         'attempt' => 1,
     ]);
 });
@@ -95,7 +94,7 @@ it('can log a failed notification', function () {
         'queued' => false,
         'channel' => 'database',
         'message' => null,
-        'status' => 'error',
+        'status' => NotificationDeliveryStatus::FAILED,
         'response' => $e,
         'attempt' => 1,
     ]);
@@ -120,38 +119,6 @@ it('can log a notification sent to a anonymous notifiable', function () {
         ->and($log->queued)->toBeFalse()
         ->and($log->channel)->toBe('mail')
         ->and($log->message)->toBeNull()
-        ->and($log->status)->toBe('sending')
+        ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1);
-});
-
-it('prevents sending notifications to non-unique fingerprint', function () {
-    $notifiable = new TestUser();
-    $notification = new DummyNotificationUnique();
-
-    $logger = new NotificationLogger();
-    config(['notification-log.resolve-notification-message' => true]);
-    $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
-
-    $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
-
-    $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
-
-    expect($log)->toBeFalse();
-    assertDatabaseCount('notification_logs_sent_notifications', 1);
-});
-
-it('allows sending notifications with same fingerprint but different channels', function () {
-    $notifiable = new TestUser();
-    $notification = new DummyNotificationUnique();
-
-    $logger = new NotificationLogger();
-    config(['notification-log.resolve-notification-message' => true]);
-    $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
-
-    $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
-
-    $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'broadcast'));
-
-    expect($log)->not->toBeFalse();
-    assertDatabaseCount('notification_logs_sent_notifications', 2);
 });

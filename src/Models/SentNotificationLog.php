@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 
 /**
  * @property string $id
@@ -42,6 +43,7 @@ class SentNotificationLog extends Model
         'queued' => 'boolean',
         'message' => 'json',
         'anonymous_notifiable_routes' => 'array',
+        'status' => NotificationDeliveryStatus::class,
     ];
 
     public function prunable(): Builder
