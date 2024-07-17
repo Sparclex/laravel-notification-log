@@ -5,11 +5,12 @@ namespace Okaufmann\LaravelNotificationLog\Tests\Support;
 use Closure;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
+use Okaufmann\LaravelNotificationLog\Contracts\EnsureUniqueNotification;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Models\Concerns\HasHistory;
 use Okaufmann\LaravelNotificationLog\Models\Concerns\LogsNotifications;
 
-class DummyNotificationWithHistory extends Notification implements ShouldLogNotification
+class DummyNotificationWithHistory extends Notification implements EnsureUniqueNotification, ShouldLogNotification
 {
     use HasHistory;
     use LogsNotifications;
@@ -29,7 +30,7 @@ class DummyNotificationWithHistory extends Notification implements ShouldLogNoti
         ]);
     }
 
-    public function fingerprint()
+    public function fingerprint($notifiable): string
     {
         return 'dummy-fingerprint';
     }

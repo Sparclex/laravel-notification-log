@@ -12,16 +12,23 @@ use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
+use Okaufmann\LaravelNotificationLog\Contracts\EnsureUniqueNotification;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 
 class NotificationLogger
 {
-    public function logSendingNotification(NotificationSending $event): ?SentNotificationLog
+    public function logSendingNotification(NotificationSending $event): SentNotificationLog|false|null
     {
         if (! $event->notification instanceof ShouldLogNotification) {
             return null;
+        }
+
+        if ($event->notification instanceof EnsureUniqueNotification
+            && $event->notification->wasSentTo($event->notifiable, withSameFingerprint: true)->onChannel($event->channel)->inThePast()
+        ) {
+            return false;
         }
 
         $currentAttempt = SentNotificationLog::query()
@@ -245,7 +252,7 @@ class NotificationLogger
 
     protected function getNotificationId(Notification $notification): string
     {
-        if (property_exists($notification, 'id')) {
+        if (property_exists($notification, 'id') && $notification->id !== null) {
             return $notification->id;
         }
 
