@@ -33,7 +33,7 @@ class NotificationLogger
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $event->channel,
+            'channel' => $this->normalizeChannelName($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'notifiable_type' => $this->getNotifiableType($event),
@@ -60,7 +60,7 @@ class NotificationLogger
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $event->channel,
+            'channel' => $this->normalizeChannelName($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'notifiable_type' => $this->getNotifiableType($event),
@@ -85,7 +85,7 @@ class NotificationLogger
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $event->channel,
+            'channel' => $this->normalizeChannelName($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'data' => $this->formatResponse($event->response),
@@ -105,7 +105,7 @@ class NotificationLogger
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $event->channel,
+            'channel' => $this->normalizeChannelName($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'data' => $event->data,
@@ -189,6 +189,26 @@ class NotificationLogger
         }
 
         return null;
+    }
+
+    public function normalizeChannelName($channel)
+    {
+        if (! class_exists($channel)) {
+            return $channel;
+        }
+
+        return $this->shortNameFromChannelType($channel);
+    }
+
+    protected function shortNameFromChannelType($type): string
+    {
+        // Extract the last part of the namespace and class name
+        $parts = explode('\\', $type);
+        $className = end($parts);
+
+        return Str::of($className)
+            ->replace('Channel', '')
+            ->lower();
     }
 
     protected function getNotifiableType(NotificationSending $event): ?string
