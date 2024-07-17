@@ -25,6 +25,20 @@ class NotificationLogger
             return null;
         }
 
+        $currentAttempt = SentNotificationLog::query()
+            ->where('notification_id', $this->getNotificationId($event->notification))
+            ->where('channel', $event->channel)
+            ->max('attempt');
+
+        // when you retry a job after it failed after several tries, the attempt of the instance will be reset as
+        // it will be pushed as a new instance with the same notification id to the queue.
+        // Therefor we need to increment the attempt manually by looking it up in the logs table.
+        if ($currentAttempt > $event->notification->getCurrentAttempt()) {
+            $event->notification->setCurrentAttempt($currentAttempt + 1);
+        } else {
+            $event->notification->setCurrentAttempt();
+        }
+
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
