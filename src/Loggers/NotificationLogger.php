@@ -188,6 +188,12 @@ class NotificationLogger
                 return $message->toArray();
             }
 
+            if ($channel instanceof \Illuminate\Notifications\Slack\SlackChannel) {
+                $message = $notification->toSlack($notifiable, $notification);
+
+                return $message->toArray();
+            }
+
             if ($channel instanceof DatabaseChannel) {
                 if (method_exists($notification, 'toDatabase')) {
                     return is_array($data = $notification->toDatabase($notifiable))

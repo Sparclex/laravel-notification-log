@@ -21,6 +21,11 @@ parameters:
 			path: src/Loggers/NotificationLogger.php
 
 		-
+			message: "#^Call to an undefined method Illuminate\\\\Notifications\\\\Notification\\:\\:toSlack\\(\\)\\.$#"
+			count: 1
+			path: src/Loggers/NotificationLogger.php
+
+		-
 			message: "#^Call to an undefined method Illuminate\\\\Notifications\\\\Notification\\:\\:toTelegram\\(\\)\\.$#"
 			count: 1
 			path: src/Loggers/NotificationLogger.php
