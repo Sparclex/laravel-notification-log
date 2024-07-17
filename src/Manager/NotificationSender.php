@@ -1,6 +1,6 @@
 <?php
 
-namespace Okaufmann\LaravelNotificationLog\Notifications;
+namespace Okaufmann\LaravelNotificationLog\Manager;
 
 use Illuminate\Notifications\NotificationSender as BaseNotificationSender;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;

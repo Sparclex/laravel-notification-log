@@ -1,6 +1,6 @@
 <?php
 
-namespace Okaufmann\LaravelNotificationLog\Notifications;
+namespace Okaufmann\LaravelNotificationLog\Manager;
 
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;

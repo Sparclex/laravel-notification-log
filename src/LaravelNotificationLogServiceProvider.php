@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Okaufmann\LaravelNotificationLog\Commands\CompressAllMessages;
 use Okaufmann\LaravelNotificationLog\Commands\DecompressAllMessages;
 use Okaufmann\LaravelNotificationLog\Listeners\MessageEventListener;
-use Okaufmann\LaravelNotificationLog\Notifications\ChannelManager;
+use Okaufmann\LaravelNotificationLog\Manager\ChannelManager;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
