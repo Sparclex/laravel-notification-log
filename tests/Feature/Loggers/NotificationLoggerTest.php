@@ -6,6 +6,8 @@ use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationWithHistory;
+use Okaufmann\LaravelNotificationLog\Tests\Support\TestUser;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -120,4 +122,36 @@ it('can log a notification sent to a anonymous notifiable', function () {
         ->and($log->message)->toBeNull()
         ->and($log->status)->toBe('sending')
         ->and($log->attempt)->toBe(1);
+});
+
+it('prevents sending notifications to non-unique fingerprint', function () {
+    $notifiable = new TestUser();
+    $notification = new DummyNotificationWithHistory();
+
+    $logger = new NotificationLogger();
+    config(['notification-log.resolve-notification-message' => true]);
+    $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
+
+    $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
+
+    $response = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
+
+    expect($response)->toBeFalse();
+    assertDatabaseCount('notification_logs_sent_notifications', 1);
+});
+
+it('allows sending notifications with same fingerprint but different channels', function () {
+    $notifiable = new TestUser();
+    $notification = new DummyNotificationWithHistory();
+
+    $logger = new NotificationLogger();
+    config(['notification-log.resolve-notification-message' => true]);
+    $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
+
+    $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
+
+    $response = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'broadcast'));
+
+    expect($response)->not->toBeFalse();
+    assertDatabaseCount('notification_logs_sent_notifications', 2);
 });
