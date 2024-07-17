@@ -27,6 +27,8 @@ class NotificationHistoryQueryBuilder
 
     public function onChannel(string $channel): static
     {
+        $channel = resolve(NotificationLogger::class)->resolveChannel($channel);
+
         $this->query
             ->where('channel', $channel);
 
@@ -41,7 +43,7 @@ class NotificationHistoryQueryBuilder
             })
             ->when($this->withSameFingerprint, function (Builder $query) {
 
-                $fingerprint = (new NotificationLogger())->getFingerprintForNotification(
+                $fingerprint = resolve(NotificationLogger::class)->getFingerprintForNotification(
                     $this->notification,
                     $this->notifiable,
                 );

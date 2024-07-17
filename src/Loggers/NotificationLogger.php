@@ -33,7 +33,7 @@ class NotificationLogger
         $sentNotificationLog = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $this->normalizeChannelName($event->channel),
+            'channel' => $this->resolveChannel($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'notifiable_type' => $this->getNotifiableType($event),
@@ -60,7 +60,7 @@ class NotificationLogger
         $sentNotificationLog = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $this->normalizeChannelName($event->channel),
+            'channel' => $this->resolveChannel($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'notifiable_type' => $this->getNotifiableType($event),
@@ -86,7 +86,7 @@ class NotificationLogger
         $sentNotificationLog = SentNotificationLog::updateOrCreate([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $this->normalizeChannelName($event->channel),
+            'channel' => $this->resolveChannel($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'data' => $this->formatResponse($event->response),
@@ -107,7 +107,7 @@ class NotificationLogger
         $findData = [
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
-            'channel' => $this->normalizeChannelName($event->channel),
+            'channel' => $this->resolveChannel($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
         ];
 
@@ -223,9 +223,9 @@ class NotificationLogger
         return get_class($notification);
     }
 
-    public function normalizeChannelName($channel)
+    public function resolveChannel($channel)
     {
-        if (! class_exists($channel)) {
+        if (blank($channel) || ! class_exists($channel)) {
             return $channel;
         }
 

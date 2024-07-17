@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 
 /**
@@ -79,6 +80,10 @@ class SentNotificationLog extends Model
         ?Carbon $after = null,
         string|array|null $channel = null,
     ): Builder {
+        $channels = collect(Arr::wrap($channel))
+            ->map(fn ($channel) => resolve(NotificationLogger::class)->resolveChannel($channel))
+            ->toArray();
+
         return self::query()
             ->where('notifiable_type', $notifiable->getMorphClass())
             ->where('notifiable_id', $notifiable->getKey())
@@ -86,8 +91,8 @@ class SentNotificationLog extends Model
             ->when($notificationType, function (Builder $query) use ($notificationType) {
                 $query->whereIn('notification_type', Arr::wrap($notificationType));
             })
-            ->when($channel, function (Builder $query) use ($channel) {
-                $query->whereIn('channel', Arr::wrap($channel));
+            ->when($channel, function (Builder $query) use ($channels) {
+                $query->whereIn('channel', $channels);
             })
             ->when($before, function (Builder $query) use ($before) {
                 $query->where('created_at', '<', $before->toDateTimeString());
