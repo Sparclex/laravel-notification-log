@@ -12,7 +12,10 @@ use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 
 class MessageEventListener
 {
-    public function __construct(protected readonly NotificationLogger $notificationLogger, protected readonly MessageLogger $messageLogger) {}
+    public function __construct(
+        protected readonly NotificationLogger $notificationLogger,
+        protected readonly MessageLogger $messageLogger,
+    ) {}
 
     public function handleSentNotification(NotificationSent $event): void
     {
@@ -28,6 +31,7 @@ class MessageEventListener
 
             return false;
         }
+
         $this->notificationLogger->logSendingNotification($event);
 
         return null;
