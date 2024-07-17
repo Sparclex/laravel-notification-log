@@ -15,7 +15,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 it('does not log a sending notification message when disabled in configuration', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
-    $listener = app(MessageEventListener::class);
+    $listener = resolve(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => false]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
@@ -26,7 +26,7 @@ it('does not log a sending notification message when disabled in configuration',
 it('does log a sending notification event when enabled in configuration', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
-    $listener = app(MessageEventListener::class);
+    $listener = resolve(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
@@ -38,7 +38,7 @@ it('skips notifications to non-unique fingerprint', function () {
     $notifiable = new TestUser();
     $notification = new DummyNotificationUnique();
     $nonUniqueNotification = clone $notification;
-    $listener = app(MessageEventListener::class);
+    $listener = resolve(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
@@ -53,7 +53,7 @@ it('sends notifications with same fingerprint but different channels', function 
     $notifiable = new TestUser();
     $notification = new DummyNotificationUnique();
     $nonUniqueNotification = clone $notification;
-    $listener = app(MessageEventListener::class);
+    $listener = resolve(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
