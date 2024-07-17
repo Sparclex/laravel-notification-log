@@ -26,6 +26,11 @@ parameters:
 			path: src/Loggers/NotificationLogger.php
 
 		-
+			message: "#^Call to an undefined method Illuminate\\\\Notifications\\\\Notification\\:\\:toTwilio\\(\\)\\.$#"
+			count: 1
+			path: src/Loggers/NotificationLogger.php
+
+		-
 			message: "#^Call to an undefined method Illuminate\\\\Notifications\\\\Notification\\:\\:toVonage\\(\\)\\.$#"
 			count: 1
 			path: src/Loggers/NotificationLogger.php
