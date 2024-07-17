@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-notification-log` will be documented in this file.
 
+## 3.0.0 - 2024-07-17
+
+### What's Changed
+
+- Use NotificationFailed event of Laravel and change response handling
+- Add support for Twilio and Slack channels
+- Handle channels that fire NotificationFailed events
+
+**Full Changelog**: https://github.com/okaufmann/laravel-notification-log/compare/2.1.0...3.0.0
+
 ## 2.1.0 - 2024-07-17
 
 ### What's Changed
