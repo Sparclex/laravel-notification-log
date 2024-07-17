@@ -22,11 +22,11 @@ class NotificationLogger
 {
     public function logSkippedNotification(NotificationSending $event): ?SentNotificationLog
     {
+        $this->increaseNotificationAttempt($event);
+
         if (! $event->notification instanceof ShouldLogNotification) {
             return null;
         }
-
-        $this->increaseNotificationAttempt($event);
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
@@ -49,11 +49,11 @@ class NotificationLogger
 
     public function logSendingNotification(NotificationSending $event): ?SentNotificationLog
     {
+        $this->increaseNotificationAttempt($event);
+
         if (! $event->notification instanceof ShouldLogNotification) {
             return null;
         }
-
-        $this->increaseNotificationAttempt($event);
 
         /** @var SentNotificationLog $notification */
         $notification = SentNotificationLog::updateOrCreate([
