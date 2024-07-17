@@ -2,6 +2,7 @@
 
 use Illuminate\Notifications\Events\NotificationSending;
 use Okaufmann\LaravelNotificationLog\Listeners\MessageEventListener;
+use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationUnique;
@@ -43,8 +44,8 @@ it('skips notifications to non-unique fingerprint', function () {
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
     $listener->handleSendingNotification(new NotificationSending($notifiable, $nonUniqueNotification, 'database'));
 
-    assertDatabaseHas('notification_logs_sent_notifications', ['status' => 'sending']);
-    assertDatabaseHas('notification_logs_sent_notifications', ['status' => 'skipped']);
+    assertDatabaseHas('notification_logs_sent_notifications', ['status' => NotificationDeliveryStatus::SENDING]);
+    assertDatabaseHas('notification_logs_sent_notifications', ['status' => NotificationDeliveryStatus::SKIPPED]);
     assertDatabaseCount('notification_logs_sent_notifications', 2);
 });
 
@@ -58,7 +59,7 @@ it('sends notifications with same fingerprint but different channels', function 
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
     $listener->handleSendingNotification(new NotificationSending($notifiable, $nonUniqueNotification, 'broadcast'));
 
-    assertDatabaseHas('notification_logs_sent_notifications', ['status' => 'sending']);
-    assertDatabaseMissing('notification_logs_sent_notifications', ['status' => 'skipped']);
+    assertDatabaseHas('notification_logs_sent_notifications', ['status' => NotificationDeliveryStatus::SENDING]);
+    assertDatabaseMissing('notification_logs_sent_notifications', ['status' => NotificationDeliveryStatus::SKIPPED]);
     assertDatabaseCount('notification_logs_sent_notifications', 2);
 });

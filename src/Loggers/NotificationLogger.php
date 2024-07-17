@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
+use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 
 class NotificationLogger
 {
@@ -40,7 +41,7 @@ class NotificationLogger
             'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
-            'status' => 'skipped',
+            'status' => NotificationDeliveryStatus::SKIPPED,
         ]);
 
         return $notification;
@@ -67,7 +68,7 @@ class NotificationLogger
             'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
-            'status' => 'sending',
+            'status' => NotificationDeliveryStatus::SENDING,
         ]);
 
         return $notification;
@@ -87,7 +88,7 @@ class NotificationLogger
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'response' => $this->formatResponse($event->response),
-            'status' => 'sent',
+            'status' => NotificationDeliveryStatus::SENT,
         ]);
 
         return $notification;
@@ -107,7 +108,7 @@ class NotificationLogger
             'attempt' => $event->notification->getCurrentAttempt(),
         ], [
             'response' => $event->exception,
-            'status' => 'error',
+            'status' => NotificationDeliveryStatus::FAILED,
         ]);
 
         return $notification;
