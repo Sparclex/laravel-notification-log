@@ -12,6 +12,7 @@ use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
@@ -270,10 +271,10 @@ class NotificationLogger
 
     protected function getNotificationId(Notification $notification): string
     {
-        if (property_exists($notification, 'id') && $notification->id !== null) {
-            return $notification->id;
+        if (! $notification->id) {
+            $notification->id = Str::uuid()->toString();
         }
 
-        return md5(serialize($notification));
+        return $notification->id;
     }
 }
