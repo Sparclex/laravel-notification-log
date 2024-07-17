@@ -10,7 +10,7 @@ use function Pest\Laravel\assertDatabaseCount;
 it('does not log a sending notification message when disabled in configuration', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
-    $listener = new MessageEventListener();
+    $listener = app(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => false]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
@@ -21,7 +21,7 @@ it('does not log a sending notification message when disabled in configuration',
 it('does log a sending notification event when enabled in configuration', function () {
     $notifiable = new DummyNotifiable();
     $notification = new DummyNotification();
-    $listener = new MessageEventListener();
+    $listener = app(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));

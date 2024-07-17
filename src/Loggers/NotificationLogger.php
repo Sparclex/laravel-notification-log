@@ -12,23 +12,41 @@ use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
-use Okaufmann\LaravelNotificationLog\Contracts\EnsureUniqueNotification;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Events\NotificationFailed;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 
 class NotificationLogger
 {
-    public function logSendingNotification(NotificationSending $event): SentNotificationLog|false|null
+    public function logSkippedNotification(NotificationSending $event): ?SentNotificationLog
     {
         if (! $event->notification instanceof ShouldLogNotification) {
             return null;
         }
 
-        if ($event->notification instanceof EnsureUniqueNotification
-            && $event->notification->wasSentTo($event->notifiable, withSameFingerprint: true)->onChannel($event->channel)->inThePast()
-        ) {
-            return false;
+        /** @var SentNotificationLog $notification */
+        $notification = SentNotificationLog::updateOrCreate([
+            'notification_id' => $this->getNotificationId($event->notification),
+            'notification_type' => $this->getNotificationType($event),
+            'channel' => $event->channel,
+            'attempt' => $event->notification->getCurrentAttempt(),
+        ], [
+            'notifiable_type' => $this->getNotifiableType($event),
+            'notifiable_id' => $this->getNotifiableKey($event),
+            'anonymous_notifiable_routes' => $this->getAnonymousRoutes($event),
+            'fingerprint' => $this->getFingerprintForNotification($event->notification, $event->notifiable),
+            'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
+            'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
+            'status' => 'skipped',
+        ]);
+
+        return $notification;
+    }
+
+    public function logSendingNotification(NotificationSending $event): ?SentNotificationLog
+    {
+        if (! $event->notification instanceof ShouldLogNotification) {
+            return null;
         }
 
         $currentAttempt = SentNotificationLog::query()
