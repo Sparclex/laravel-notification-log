@@ -7,7 +7,7 @@ use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Models\Concerns\LogsNotifications;
 use Ramsey\Uuid\Uuid;
 
-class DummyNotification extends Notification implements ShouldLogNotification
+class DummyNotificationWithExtraData extends Notification implements ShouldLogNotification
 {
     use LogsNotifications;
 
@@ -31,5 +31,12 @@ class DummyNotification extends Notification implements ShouldLogNotification
     public function fingerprint($notifiable)
     {
         return "dummy-fingerprint-{$this->id}";
+    }
+
+    public function getExtraData(): array
+    {
+        return [
+            'extra' => 'data',
+        ];
     }
 }

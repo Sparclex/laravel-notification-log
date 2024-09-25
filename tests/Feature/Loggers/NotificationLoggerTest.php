@@ -8,6 +8,7 @@ use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationViaTestChannel;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationWithExtraData;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -168,7 +169,7 @@ it('can log a notification sent to a anonymous notifiable', function () {
 
 it('it also logs notification extra data', function () {
     $notifiable = new DummyNotifiable;
-    $notification = new DummyNotification;
+    $notification = new DummyNotificationWithExtraData;
 
     $logger = new NotificationLogger;
     config(['notification-log.resolve-notification-message' => true]);
