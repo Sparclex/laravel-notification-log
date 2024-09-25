@@ -166,8 +166,7 @@ it('can log a notification sent to a anonymous notifiable', function () {
         ->and($log->sent_at)->toBeNull();
 });
 
-
-it('it also logs notification extra data', function() {
+it('it also logs notification extra data', function () {
     $notifiable = new DummyNotifiable;
     $notification = new DummyNotification;
 
@@ -184,6 +183,6 @@ it('it also logs notification extra data', function() {
         'notifiable_id' => $notifiable->getKey(),
         'notifiable_type' => get_class($notifiable),
         'channel' => 'database',
-        'data' => json_encode(['extra' => 'data', 'response' => ['message' => 'dummy response'], ]),
+        'data' => json_encode(['extra' => 'data', 'response' => ['message' => 'dummy response']]),
     ]);
 });
