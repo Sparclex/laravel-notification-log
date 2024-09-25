@@ -179,9 +179,9 @@ it('can determine if it was sent in the past', function (
 
 function executeInNotification(Closure $closure, User $notifiable): bool
 {
-    $closure = Closure::bind($closure, new DummyNotificationWithHistory());
+    $closure = Closure::bind($closure, new DummyNotificationWithHistory);
 
     DummyNotificationWithHistory::setHistoryTestCallable($closure);
 
-    return (new DummyNotificationWithHistory())->historyTest($notifiable);
+    return (new DummyNotificationWithHistory)->historyTest($notifiable);
 }

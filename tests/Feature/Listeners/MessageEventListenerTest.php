@@ -13,8 +13,8 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 
 it('does not log a sending notification message when disabled in configuration', function () {
-    $notifiable = new DummyNotifiable();
-    $notification = new DummyNotification();
+    $notifiable = new DummyNotifiable;
+    $notification = new DummyNotification;
     $listener = resolve(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => false]);
@@ -24,8 +24,8 @@ it('does not log a sending notification message when disabled in configuration',
 });
 
 it('does log a sending notification event when enabled in configuration', function () {
-    $notifiable = new DummyNotifiable();
-    $notification = new DummyNotification();
+    $notifiable = new DummyNotifiable;
+    $notification = new DummyNotification;
     $listener = resolve(MessageEventListener::class);
 
     config(['notification-log.resolve-notification-message' => true]);
@@ -35,8 +35,8 @@ it('does log a sending notification event when enabled in configuration', functi
 });
 
 it('skips notifications to non-unique fingerprint', function () {
-    $notifiable = new TestUser();
-    $notification = new DummyNotificationUnique();
+    $notifiable = new TestUser;
+    $notification = new DummyNotificationUnique;
     $nonUniqueNotification = clone $notification;
     $listener = resolve(MessageEventListener::class);
 
@@ -50,8 +50,8 @@ it('skips notifications to non-unique fingerprint', function () {
 });
 
 it('sends notifications with same fingerprint but different channels', function () {
-    $notifiable = new TestUser();
-    $notification = new DummyNotificationUnique();
+    $notifiable = new TestUser;
+    $notification = new DummyNotificationUnique;
     $nonUniqueNotification = clone $notification;
     $listener = resolve(MessageEventListener::class);
 

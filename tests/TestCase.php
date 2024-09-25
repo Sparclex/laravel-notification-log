@@ -47,10 +47,6 @@ class TestCase extends Orchestra
             'prefix' => '',
         ]);
 
-        $sentMessageLogsTableMigration = require __DIR__.'/../database/migrations/create_notification_logs_sent_messages_table.php.stub';
-
-        $sentMessageLogsTableMigration->up();
-
         $sentNotificationLogsTableMigration = require __DIR__.'/../database/migrations/create_notification_logs_sent_notifications_table.php.stub';
 
         $sentNotificationLogsTableMigration->up();

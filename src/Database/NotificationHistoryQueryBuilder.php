@@ -17,7 +17,7 @@ class NotificationHistoryQueryBuilder
         protected bool $shouldExist,
         protected bool $withSameFingerprint,
     ) {
-        $type = (new NotificationLogger())->getNotificationTypeForNotification($this->notification, $this->notifiable);
+        $type = (new NotificationLogger)->getNotificationTypeForNotification($this->notification, $this->notifiable);
 
         $this->query = $this->notifiable
             ->latestLoggedNotificationQuery(

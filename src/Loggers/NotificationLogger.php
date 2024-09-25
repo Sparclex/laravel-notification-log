@@ -3,7 +3,9 @@
 namespace Okaufmann\LaravelNotificationLog\Loggers;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Mail\SentMessage;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Channels\DatabaseChannel;
@@ -18,6 +20,9 @@ use JsonSerializable;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 
 class NotificationLogger
 {
@@ -77,21 +82,29 @@ class NotificationLogger
 
     public function logSentNotification(NotificationSent $event): ?SentNotificationLog
     {
-
         if (! $event->notification instanceof ShouldLogNotification) {
             return null;
         }
 
         /** @var SentNotificationLog $sentNotificationLog */
-        $sentNotificationLog = SentNotificationLog::updateOrCreate([
+        $sentNotificationLog = SentNotificationLog::query()->firstOrNew([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->resolveChannel($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
-        ], [
-            'data' => $this->formatResponse($event->response),
-            'status' => NotificationDeliveryStatus::SENT,
         ]);
+
+        $data = [
+            ...$sentNotificationLog->data ?? [],
+            ...$this->buildExtraChannelData($event->channel, $event->notification, $event->notifiable, $event->response),
+            'response' => $this->formatResponse($event->response),
+        ];
+
+        $sentNotificationLog->status = NotificationDeliveryStatus::SENT;
+        $sentNotificationLog->sent_at = now();
+        $sentNotificationLog->data = $data;
+
+        $sentNotificationLog->save();
 
         return $sentNotificationLog;
     }
@@ -147,12 +160,17 @@ class NotificationLogger
         $channelManager = resolve(ChannelManager::class);
         $channel = $channelManager->driver($channel);
 
-        // we never want to save the mail message here, as it will be logged by the mail logger.
-        if ($channel instanceof MailChannel) {
-            return null;
-        }
-
         try {
+            if ($channel instanceof MailChannel) {
+                $message = $notification->toMail($notifiable);
+
+                if ($message instanceof Renderable) {
+                    return $message->render();
+                }
+
+                return null;
+            }
+
             if ($channel instanceof \Illuminate\Notifications\Channels\VonageSmsChannel) {
                 $message = $notification->toVonage($notifiable);
 
@@ -179,19 +197,19 @@ class NotificationLogger
                     $message = \NotificationChannels\Telegram\TelegramMessage::create($message);
                 }
 
-                return $message->toArray();
+                return json_encode($message->toArray());
             }
 
             if ($channel instanceof \NotificationChannels\WebPush\WebPushChannel) {
                 $message = $notification->toWebPush($notifiable, $notification);
 
-                return $message->toArray();
+                return json_encode($message->toArray());
             }
 
             if ($channel instanceof \Illuminate\Notifications\Slack\SlackChannel) {
                 $message = $notification->toSlack($notifiable, $notification);
 
-                return $message->toArray();
+                return json_encode($message->toArray());
             }
 
             if ($channel instanceof DatabaseChannel) {
@@ -201,7 +219,7 @@ class NotificationLogger
                 }
 
                 if (method_exists($notification, 'toArray')) {
-                    return $notification->toArray($notifiable);
+                    return json_encode($notification->toArray($notifiable));
                 }
             }
 
@@ -337,7 +355,7 @@ class NotificationLogger
     protected function getNotificationId(Notification $notification): string
     {
         if (! $notification->id) {
-            $notification->id = Str::uuid()->toString();
+            $notification->id = (string) Str::uuid();
         }
 
         return $notification->id;
@@ -360,5 +378,58 @@ class NotificationLogger
         } else {
             $event->notification->setCurrentAttempt();
         }
+    }
+
+    private function buildExtraChannelData(string $channel, Notification $notification, $notifiable, mixed $response)
+    {
+        if ($response instanceof SentMessage) {
+            $rawMessage = $response->getSymfonySentMessage()->getOriginalMessage();
+
+            if (! $rawMessage instanceof Email) {
+                return [];
+            }
+
+            return [
+                'to' => $this->listEmailAddresses($rawMessage->getTo()),
+                'cc' => $this->listEmailAddresses($rawMessage->getCc()),
+                'bcc' => $this->listEmailAddresses($rawMessage->getBcc()),
+                'reply_to' => $this->listEmailAddresses($rawMessage->getReplyTo()),
+                'sender' => $this->listEmailAddresses([$rawMessage->getSender()]),
+                'subject' => $rawMessage->getSubject(),
+                'sent_at' => $rawMessage->getDate(),
+                'attachments' => $this->listEmailAttachments($rawMessage->getAttachments()),
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param  Address[]  $addresses
+     * @return ?string[]
+     */
+    protected function listEmailAddresses(?array $addresses): ?array
+    {
+        $addresses = collect($addresses)
+            ->filter()
+            ->map(fn (Address $address) => $address->getName() ? "{$address->getName()} <{$address->getAddress()}>" : $address->getAddress())
+            ->values()
+            ->toArray();
+
+        if (blank($addresses)) {
+            return null;
+        }
+
+        return $addresses;
+    }
+
+    /**
+     * @param  DataPart[]  $getAttachments
+     */
+    protected function listEmailAttachments(array $getAttachments): array
+    {
+        return collect($getAttachments)
+            ->map(fn (DataPart $attachment) => $attachment->getFilename())
+            ->toArray();
     }
 }

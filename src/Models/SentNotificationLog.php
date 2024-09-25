@@ -23,9 +23,10 @@ use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
  * @property string $fingerprint
  * @property string $channel
  * @property int $attempt
+ * @property Carbon $sent_at
  * @property array $notifiable
  * @property bool $queued
- * @property array $message
+ * @property string $message
  * @property array $data
  * @property NotificationDeliveryStatus $status
  * @property Carbon $created_at
@@ -43,7 +44,6 @@ class SentNotificationLog extends Model
 
     protected $casts = [
         'queued' => 'boolean',
-        'message' => 'json',
         'data' => 'json',
         'anonymous_notifiable_routes' => 'array',
         'status' => NotificationDeliveryStatus::class,
