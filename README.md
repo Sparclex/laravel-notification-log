@@ -6,7 +6,7 @@
 [![Check & fix styling](https://github.com/okaufmann/laravel-notification-log/actions/workflows/php-code-style.yml/badge.svg)](https://github.com/okaufmann/laravel-notification-log/actions/workflows/php-code-style.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/okaufmann/laravel-notification-log.svg?style=flat-square)](https://packagist.org/packages/okaufmann/laravel-notification-log)
 
-Logs every sent Notification and Mail of your entire Laravel Project.
+Logs every sent Notification of your entire Laravel Project.
 
 ## Installation
 
