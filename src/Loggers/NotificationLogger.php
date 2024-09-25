@@ -28,7 +28,7 @@ class NotificationLogger
 {
     public function logSkippedNotification(NotificationSending $event): ?SentNotificationLog
     {
-        if (! $event->notification instanceof ShouldLogNotification) {
+        if (!$event->notification instanceof ShouldLogNotification) {
             return null;
         }
 
@@ -55,7 +55,7 @@ class NotificationLogger
 
     public function logSendingNotification(NotificationSending $event): ?SentNotificationLog
     {
-        if (! $event->notification instanceof ShouldLogNotification) {
+        if (!$event->notification instanceof ShouldLogNotification) {
             return null;
         }
 
@@ -82,7 +82,7 @@ class NotificationLogger
 
     public function logSentNotification(NotificationSent $event): ?SentNotificationLog
     {
-        if (! $event->notification instanceof ShouldLogNotification) {
+        if (!$event->notification instanceof ShouldLogNotification) {
             return null;
         }
 
@@ -97,6 +97,7 @@ class NotificationLogger
         $data = [
             ...$sentNotificationLog->data ?? [],
             ...$this->buildExtraChannelData($event->channel, $event->notification, $event->notifiable, $event->response),
+            ...$this->buildExtraNotificationData($event->notification),
             'response' => $this->formatResponse($event->response),
         ];
 
@@ -111,7 +112,7 @@ class NotificationLogger
 
     public function logFailedNotification(NotificationFailed $event): ?SentNotificationLog
     {
-        if (! $event->notification instanceof ShouldLogNotification) {
+        if (!$event->notification instanceof ShouldLogNotification) {
             return null;
         }
 
@@ -128,7 +129,7 @@ class NotificationLogger
             ->where($findData)
             ->first();
 
-        if (! $notificationLog) {
+        if (!$notificationLog) {
             // a notification needs to at least be in status sending first.
             // therefore it must exist in the logs table before can be declared as failed.
             return null;
@@ -153,7 +154,7 @@ class NotificationLogger
 
     public function resolveMessage(string $channel, Notification $notification, $notifiable)
     {
-        if (! config('notification-log.resolve-notification-message')) {
+        if (!config('notification-log.resolve-notification-message')) {
             return null;
         }
 
@@ -249,7 +250,7 @@ class NotificationLogger
 
     public function resolveChannel($channel)
     {
-        if (blank($channel) || ! class_exists($channel)) {
+        if (blank($channel) || !class_exists($channel)) {
             return $channel;
         }
 
@@ -296,7 +297,7 @@ class NotificationLogger
 
     protected function getAnonymousRoutes(NotificationSending $event): ?array
     {
-        if (! $event->notifiable instanceof AnonymousNotifiable) {
+        if (!$event->notifiable instanceof AnonymousNotifiable) {
             return null;
         }
 
@@ -306,12 +307,12 @@ class NotificationLogger
     /**
      * Format the given notifiable into a tag.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      */
     protected function formatNotifiable($notifiable): string
     {
         if ($notifiable instanceof Model) {
-            return get_class($notifiable).':'.implode('_', Arr::wrap($notifiable->getKey()));
+            return get_class($notifiable) . ':' . implode('_', Arr::wrap($notifiable->getKey()));
         }
 
         if ($notifiable instanceof AnonymousNotifiable) {
@@ -319,7 +320,7 @@ class NotificationLogger
                 return is_array($route) ? implode(',', $route) : $route;
             }, $notifiable->routes);
 
-            return 'Anonymous:'.implode(',', $routes);
+            return 'Anonymous:' . implode(',', $routes);
         }
 
         return get_class($notifiable);
@@ -354,8 +355,8 @@ class NotificationLogger
 
     protected function getNotificationId(Notification $notification): string
     {
-        if (! $notification->id) {
-            $notification->id = (string) Str::uuid();
+        if (!$notification->id) {
+            $notification->id = (string)Str::uuid();
         }
 
         return $notification->id;
@@ -385,7 +386,7 @@ class NotificationLogger
         if ($response instanceof SentMessage) {
             $rawMessage = $response->getSymfonySentMessage()->getOriginalMessage();
 
-            if (! $rawMessage instanceof Email) {
+            if (!$rawMessage instanceof Email) {
                 return [];
             }
 
@@ -405,14 +406,14 @@ class NotificationLogger
     }
 
     /**
-     * @param  Address[]  $addresses
+     * @param Address[] $addresses
      * @return ?string[]
      */
     protected function listEmailAddresses(?array $addresses): ?array
     {
         $addresses = collect($addresses)
             ->filter()
-            ->map(fn (Address $address) => $address->getName() ? "{$address->getName()} <{$address->getAddress()}>" : $address->getAddress())
+            ->map(fn(Address $address) => $address->getName() ? "{$address->getName()} <{$address->getAddress()}>" : $address->getAddress())
             ->values()
             ->toArray();
 
@@ -424,12 +425,27 @@ class NotificationLogger
     }
 
     /**
-     * @param  DataPart[]  $getAttachments
+     * @param DataPart[] $getAttachments
      */
     protected function listEmailAttachments(array $getAttachments): array
     {
         return collect($getAttachments)
-            ->map(fn (DataPart $attachment) => $attachment->getFilename())
+            ->map(fn(DataPart $attachment) => $attachment->getFilename())
             ->toArray();
+    }
+
+    private function buildExtraNotificationData(Notification $notification)
+    {
+        if (method_exists($notification, 'getExtraData')) {
+            $extra = $notification->getExtraData();
+
+            if (!is_array($extra)) {
+                throw new \InvalidArgumentException('getExtraData() must return an array');
+            }
+
+            return $extra;
+        }
+
+        return [];
     }
 }

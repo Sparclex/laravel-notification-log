@@ -32,4 +32,11 @@ class DummyNotification extends Notification implements ShouldLogNotification
     {
         return "dummy-fingerprint-{$this->id}";
     }
+
+    public function getExtraData(): array
+    {
+        return [
+            'extra' => 'data',
+        ];
+    }
 }

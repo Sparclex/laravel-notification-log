@@ -58,7 +58,6 @@ it('can log a sending notification without message when disabled', function () {
 });
 
 it('can update a notification once it is sent', function () {
-
     freezeTime();
 
     $notifiable = new DummyNotifiable;
@@ -165,4 +164,26 @@ it('can log a notification sent to a anonymous notifiable', function () {
         ->and($log->attempt)->toBe(1)
         ->and($log->data)->toBeNull()
         ->and($log->sent_at)->toBeNull();
+});
+
+
+it('it also logs notification extra data', function() {
+    $notifiable = new DummyNotifiable;
+    $notification = new DummyNotification;
+
+    $logger = new NotificationLogger;
+    config(['notification-log.resolve-notification-message' => true]);
+    $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
+
+    $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
+
+    assertDatabaseCount('notification_logs_sent_notifications', 1);
+    assertDatabaseHas('notification_logs_sent_notifications', [
+        'notification_id' => $notification->id,
+        'notification_type' => get_class($notification),
+        'notifiable_id' => $notifiable->getKey(),
+        'notifiable_type' => get_class($notifiable),
+        'channel' => 'database',
+        'data' => json_encode(['extra' => 'data', 'response' => ['message' => 'dummy response'], ]),
+    ]);
 });
