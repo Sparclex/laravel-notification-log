@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-notification-log` will be documented in this file.
 
+## 4.1.1 - 2024-09-26
+
+### What's Changed
+
+- Log mail sender (Now for real)
+
+**Full Changelog**: https://github.com/okaufmann/laravel-notification-log/compare/4.1.0...4.1.1
+
 ## 4.1.0 - 2024-09-26
 
 ### What's Changed
@@ -102,6 +110,7 @@ return new class extends Migration {
         return $data;
     }
 };
+
 
 
 
