@@ -2,6 +2,43 @@
 
 All notable changes to `laravel-notification-log` will be documented in this file.
 
+## 4.2.0 - 2024-09-26
+
+### What's Changed
+
+- Added support to store serialized notifications in the logs table
+- Added support to resend a notification
+
+### Upgrade to 4.2.0
+
+Be sure to add and run the following migration:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::table('notification_logs_sent_notifications', function (Blueprint $table) {
+            $table->text('notification_serialized')->nullable()->after('sent_at');
+        });
+    }
+};
+
+
+```
+Also you may want to publish the configs by running
+
+```shell
+php artisan vendor:publish --tag="notification-log-config"
+
+```
+**Full Changelog**: https://github.com/okaufmann/laravel-notification-log/compare/4.1.2...4.2.0
+
 ## 4.1.1 - 2024-09-26
 
 ### What's Changed
@@ -110,6 +147,7 @@ return new class extends Migration {
         return $data;
     }
 };
+
 
 
 
