@@ -19,6 +19,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use Okaufmann\LaravelNotificationLog\Contracts\ResendableNotification;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
@@ -89,6 +90,10 @@ class NotificationLogger
             ...$this->buildExtraNotificationData($event->notification),
         ];
 
+        if ($event->notification instanceof ResendableNotification && $event->notification->isBeingResent()) {
+            $data['was_resent'] = true;
+        }
+
         $sentNotificationLog->fill([
             'notifiable_type' => $this->getNotifiableType($event),
             'notifiable_id' => $this->getNotifiableKey($event),
@@ -123,7 +128,6 @@ class NotificationLogger
         $data = [
             ...$sentNotificationLog->data ?? [],
             ...$this->buildSentChannelData($event->channel, $event->notification, $event->notifiable, $event->response),
-
             'response' => $this->formatResponse($event->response),
         ];
 

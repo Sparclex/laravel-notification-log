@@ -9,6 +9,7 @@ use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyMailNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationResendable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationViaTestChannel;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationWithExtraData;
 
@@ -238,4 +239,21 @@ it('it can unserialize a stored notificaton', function () {
     $unserialized = $log->notification();
 
     expect($unserialized->fingerprint($notifiable))->toBe($notification->fingerprint($notifiable));
+});
+
+it('it stores a resend flag in data', function () {
+    $notifiable = new DummyNotifiable;
+    $notification = new DummyNotificationResendable;
+
+    $logger = new NotificationLogger;
+    $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification->markAsResending(), 'database'));
+
+    expect($log->notification_id)->toBe($notification->id)
+        ->and($log->notification_type)->toBe(get_class($notification))
+        ->and($log->notifiable_type)->toBe(get_class($notifiable))
+        ->and($log->notifiable_id)->toBe($notifiable->getKey())
+        ->and($log->fingerprint)->toBe('dummy-fingerprint')
+        ->and($log->data)->toBe([
+            'was_resent' => true,
+        ]);
 });
