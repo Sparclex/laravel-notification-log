@@ -1,10 +1,12 @@
 <?php
 
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyMailNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotifiable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotification;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationViaTestChannel;
@@ -32,7 +34,7 @@ it('can log a sending notification event', function () {
         ->and($log->message)->toBe(json_encode(['message' => 'This is just a example message.']))
         ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1)
-        ->and($log->data)->toBeNull()
+        ->and($log->data)->toBe([])
         ->and($log->sent_at)->toBeNull();
 });
 
@@ -54,7 +56,7 @@ it('can log a sending notification without message when disabled', function () {
         ->and($log->message)->toBe(null)
         ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1)
-        ->and($log->data)->toBeNull()
+        ->and($log->data)->toBe([])
         ->and($log->sent_at)->toBeNull();
 });
 

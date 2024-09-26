@@ -3,6 +3,7 @@
 namespace Okaufmann\LaravelNotificationLog\Loggers;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\SentMessage;
@@ -13,6 +14,7 @@ use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -35,12 +37,20 @@ class NotificationLogger
         $this->increaseNotificationAttempt($event);
 
         /** @var SentNotificationLog $sentNotificationLog */
-        $sentNotificationLog = SentNotificationLog::updateOrCreate([
+        $sentNotificationLog = SentNotificationLog::query()->firstOrNew([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->resolveChannel($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
-        ], [
+        ]);
+
+        $data = [
+            ...$sentNotificationLog->data ?? [],
+            ...$this->buildSendingChannelData($event->channel, $event->notification, $event->notifiable),
+            ...$this->buildExtraNotificationData($event->notification),
+        ];
+
+        $sentNotificationLog->fill([
             'notifiable_type' => $this->getNotifiableType($event),
             'notifiable_id' => $this->getNotifiableKey($event),
             'anonymous_notifiable_routes' => $this->getAnonymousRoutes($event),
@@ -48,7 +58,10 @@ class NotificationLogger
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
             'status' => NotificationDeliveryStatus::SKIPPED,
+            'data' => $data,
         ]);
+
+        $sentNotificationLog->save();
 
         return $sentNotificationLog;
     }
@@ -62,12 +75,20 @@ class NotificationLogger
         $this->increaseNotificationAttempt($event);
 
         /** @var SentNotificationLog $sentNotificationLog */
-        $sentNotificationLog = SentNotificationLog::updateOrCreate([
+        $sentNotificationLog = SentNotificationLog::query()->firstOrNew([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->resolveChannel($event->channel),
             'attempt' => $event->notification->getCurrentAttempt(),
-        ], [
+        ]);
+
+        $data = [
+            ...$sentNotificationLog->data ?? [],
+            ...$this->buildSendingChannelData($event->channel, $event->notification, $event->notifiable),
+            ...$this->buildExtraNotificationData($event->notification),
+        ];
+
+        $sentNotificationLog->fill([
             'notifiable_type' => $this->getNotifiableType($event),
             'notifiable_id' => $this->getNotifiableKey($event),
             'anonymous_notifiable_routes' => $this->getAnonymousRoutes($event),
@@ -75,7 +96,10 @@ class NotificationLogger
             'queued' => in_array(ShouldQueue::class, class_implements($event->notification)),
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
             'status' => NotificationDeliveryStatus::SENDING,
+            'data' => $data,
         ]);
+
+        $sentNotificationLog->save();
 
         return $sentNotificationLog;
     }
@@ -96,8 +120,8 @@ class NotificationLogger
 
         $data = [
             ...$sentNotificationLog->data ?? [],
-            ...$this->buildExtraChannelData($event->channel, $event->notification, $event->notifiable, $event->response),
-            ...$this->buildExtraNotificationData($event->notification),
+            ...$this->buildSentChannelData($event->channel, $event->notification, $event->notifiable, $event->response),
+
             'response' => $this->formatResponse($event->response),
         ];
 
@@ -381,7 +405,7 @@ class NotificationLogger
         }
     }
 
-    private function buildExtraChannelData(string $channel, Notification $notification, $notifiable, mixed $response)
+    private function buildSentChannelData(string $channel, Notification $notification, $notifiable, mixed $response)
     {
         if ($response instanceof SentMessage) {
             $rawMessage = $response->getSymfonySentMessage()->getOriginalMessage();
@@ -448,5 +472,104 @@ class NotificationLogger
         }
 
         return [];
+    }
+
+    protected function buildSendingChannelData(string $channel, Notification $notification, mixed $notifiable)
+    {
+        $channelManager = resolve(ChannelManager::class);
+        $channel = $channelManager->driver($channel);
+
+        if ($channel instanceof MailChannel) {
+
+            /** @var MailMessage $message */
+            $message = $notification->toMail($notifiable);
+
+            $from = null;
+            if ($message->from) {
+                $from = new Address($message->from[0], $message->from[1] ?? null);
+            }
+
+            $toRoute = $notifiable->routeNotificationFor('mail', $notification);
+            $to = null;
+            if ($toRoute) {
+                $name = is_string($toRoute) ? $toRoute : $toRoute[0];
+                $address = is_string($toRoute) ? '' : $toRoute[1] ?? '';
+                $to = new Address($name, $address);
+            }
+
+            $ccAddresses = null;
+            if ($message->cc) {
+                $ccAddresses = $this->extractMailAddresses($message->cc);
+            }
+
+            $bccAddresses = null;
+            if ($message->bcc) {
+                $bccAddresses = $this->extractMailAddresses($message->bcc);
+            }
+
+            $replyToAddresses = null;
+            if ($message->replyTo) {
+                $replyToAddresses = $this->extractMailAddresses($message->replyTo);
+            }
+
+            $attachments = $this->extractAttachmentNamesFromMessage($message);
+
+            return [
+                'from' => $this->listEmailAddresses([$from]),
+                'to' => $this->listEmailAddresses([$to]),
+                'cc' => $this->listEmailAddresses($ccAddresses),
+                'bcc' => $this->listEmailAddresses($bccAddresses),
+                'reply_to' => $this->listEmailAddresses($replyToAddresses),
+                'subject' => $message->subject,
+                'attachments' => $attachments,
+            ];
+        }
+
+        return [];
+    }
+
+    protected function arrayOfAddresses($address)
+    {
+        return is_iterable($address) || $address instanceof Arrayable;
+    }
+
+    protected function extractMailAddresses(array $addresses): array
+    {
+        if ($this->arrayOfAddresses($addresses)) {
+            return collect($addresses)
+                ->map(function ($address, $name) {
+                    $addressName = is_array($address) ? $address[1] ?? '' : '';
+                    if (! is_null($addressName)) {
+                        $addressName = '';
+                    }
+
+                    $addressEmail = is_array($address) ? $address[0] : $address;
+
+                    return new Address($addressEmail, $addressName);
+                })
+                ->toArray();
+        }
+
+        return [new Address($addresses[0], $addresses[1] ?? '')];
+    }
+
+    protected function extractAttachmentNamesFromMessage(MailMessage $message): array
+    {
+        return collect([
+            ...$message->rawAttachments, ...$message->attachments,
+        ])
+            ->map(function ($attachment) {
+                if (isset($attachment['name'])) {
+                    return $attachment['name'];
+                }
+
+                if (isset($attachment['file']) && is_string($attachment['file'])) {
+                    return basename($attachment['file']);
+                }
+
+                return null;
+            })
+            ->filter()
+            ->toArray();
     }
 }
