@@ -1,7 +1,12 @@
 <?php
 
-namespace Okaufmann\LaravelNotificationLog\Concerns;
+namespace Okaufmann\LaravelNotificationLog\Models\Concerns;
 
+use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
+
+/**
+ * @mixin SentNotificationLog
+ */
 trait HandlesResending
 {
     protected bool $isResending = false;
