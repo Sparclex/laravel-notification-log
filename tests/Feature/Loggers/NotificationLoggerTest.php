@@ -3,7 +3,6 @@
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
-use Illuminate\Support\Str;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
@@ -209,7 +208,6 @@ it('it also logs notification extra data', function () {
     ]);
 });
 
-
 it('it stores serialized notification if enabled', function () {
     $notifiable = new DummyNotifiable;
     $notification = new DummyNotification;
@@ -219,7 +217,7 @@ it('it stores serialized notification if enabled', function () {
     config(['notification-log.store_serialized_notifications' => true]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
-     expect($log->notification_id)->toBe($notification->id)
+    expect($log->notification_id)->toBe($notification->id)
         ->and($log->notification_type)->toBe(get_class($notification))
         ->and($log->notifiable_type)->toBe(get_class($notifiable))
         ->and($log->notifiable_id)->toBe($notifiable->getKey())

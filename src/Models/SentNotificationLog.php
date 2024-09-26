@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Okaufmann\LaravelNotificationLog\Contracts\ResendableNotification;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 
@@ -113,5 +114,20 @@ class SentNotificationLog extends Model
         }
 
         return unserialize($this->notification_serialized, ['allowed_classes' => true]);
+    }
+
+    public function resend($notifiable, ?array $channels = null): void
+    {
+        if (! in_array(Notifiable::class, class_uses($notifiable), true)) {
+            throw new \InvalidArgumentException('The notifiable must use the Illuminate\Notifications\Notifiable trait!');
+        }
+
+        $notification = $this->notification();
+
+        if (! $notification instanceof ResendableNotification) {
+            throw new \InvalidArgumentException('The notification must implement the Okaufmann\LaravelNotificationLog\Contracts\ResendableNotification interface!');
+        }
+
+        $notifiable->notifyNow($notification->markAsResending(), $channels);
     }
 }
