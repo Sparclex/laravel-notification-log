@@ -17,7 +17,7 @@ it('does not log a sending notification message when disabled in configuration',
     $notification = new DummyNotification;
     $listener = resolve(NotificationEventListener::class);
 
-    config(['notification-log.resolve-notification-message' => false]);
+    config(['notification-log.resolve_notification_message' => false]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
     assertDatabaseCount('notification_logs_sent_notifications', 1);
@@ -28,7 +28,7 @@ it('does log a sending notification event when enabled in configuration', functi
     $notification = new DummyNotification;
     $listener = resolve(NotificationEventListener::class);
 
-    config(['notification-log.resolve-notification-message' => true]);
+    config(['notification-log.resolve_notification_message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
     assertDatabaseCount('notification_logs_sent_notifications', 1);
@@ -40,7 +40,7 @@ it('skips notifications to non-unique fingerprint', function () {
     $nonUniqueNotification = clone $notification;
     $listener = resolve(NotificationEventListener::class);
 
-    config(['notification-log.resolve-notification-message' => true]);
+    config(['notification-log.resolve_notification_message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
     $listener->handleSendingNotification(new NotificationSending($notifiable, $nonUniqueNotification, 'database'));
 
@@ -55,7 +55,7 @@ it('sends notifications with same fingerprint but different channels', function 
     $nonUniqueNotification = clone $notification;
     $listener = resolve(NotificationEventListener::class);
 
-    config(['notification-log.resolve-notification-message' => true]);
+    config(['notification-log.resolve_notification_message' => true]);
     $listener->handleSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
     $listener->handleSendingNotification(new NotificationSending($notifiable, $nonUniqueNotification, 'broadcast'));
 

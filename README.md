@@ -45,7 +45,7 @@ return [
     |
     */
 
-    'resolve-notification-message' => env('NOTIFICATION_LOG_RESOLVE_NOTIFICATION_MESSAGE', false),
+    'resolve_notification_message' => env('NOTIFICATION_LOG_RESOLVE_NOTIFICATION_MESSAGE', false),
 ];
 ```
 

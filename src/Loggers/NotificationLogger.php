@@ -178,7 +178,7 @@ class NotificationLogger
 
     public function resolveMessage(string $channel, Notification $notification, $notifiable)
     {
-        if (! config('notification-log.resolve-notification-message')) {
+        if (! config('notification-log.resolve_notification_message')) {
             return null;
         }
 

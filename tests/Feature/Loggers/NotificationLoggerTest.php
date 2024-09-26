@@ -21,7 +21,7 @@ it('can log a sending notification event', function () {
     $notification = new DummyNotification;
 
     $logger = new NotificationLogger;
-    config(['notification-log.resolve-notification-message' => true]);
+    config(['notification-log.resolve_notification_message' => true]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
     expect($log->notification_id)->toBe($notification->id)
@@ -43,7 +43,7 @@ it('can log a sending notification without message when disabled', function () {
     $notification = new DummyNotification;
 
     $logger = new NotificationLogger;
-    config(['notification-log.resolve-notification-message' => false]);
+    config(['notification-log.resolve_notification_message' => false]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
     expect($log->notification_id)->toBe($notification->id)
@@ -67,7 +67,7 @@ it('can update a notification once it is sent', function () {
     $notification = new DummyNotification;
 
     $logger = new NotificationLogger;
-    config(['notification-log.resolve-notification-message' => true]);
+    config(['notification-log.resolve_notification_message' => true]);
     $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
     $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
@@ -151,7 +151,7 @@ it('can log a notification sent to a anonymous notifiable', function () {
     $notification = new DummyMailNotification;
 
     $logger = new NotificationLogger;
-    config(['notification-log.resolve-notification-message' => true]);
+    config(['notification-log.resolve_notification_message' => true]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'mail'));
 
     expect($log->notification_id)->toBe($notification->id)
@@ -184,7 +184,7 @@ it('it also logs notification extra data', function () {
     $notification = new DummyNotificationWithExtraData;
 
     $logger = new NotificationLogger;
-    config(['notification-log.resolve-notification-message' => true]);
+    config(['notification-log.resolve_notification_message' => true]);
     $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
 
     $logger->logSentNotification(new NotificationSent($notifiable, $notification, 'database', 'dummy response'));
