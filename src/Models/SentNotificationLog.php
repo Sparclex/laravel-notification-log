@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
@@ -29,6 +30,7 @@ use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
  * @property string $message
  * @property array $data
  * @property NotificationDeliveryStatus $status
+ * @property string $notification_serialized
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -102,5 +104,14 @@ class SentNotificationLog extends Model
             })
             ->orderByDesc('created_at')
             ->orderByDesc('id');
+    }
+
+    public function notification()
+    {
+        if (! config('notification-log.store_serialized_notifications')) {
+            throw new \RuntimeException('Serialized notifications are not stored. Enable the config option `notification-log.store_serialized_notification` to use this method.');
+        }
+
+        return unserialize($this->notification_serialized, ['allowed_classes' => true]);
     }
 }

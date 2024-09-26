@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Store Serialized Notifications
+    |--------------------------------------------------------------------------
+    |
+    | If this option is enabled, the Logger will store the serialized form
+    | of the notification. This can be useful for debugging or reviewing
+    | the exact data that was sent in a notification. Also, this is
+    | required if you want to be able to resend notifications.
+    |
+    */
+    'store_serialized_notifications' => env('NOTIFICATION_LOG_STORE_SERIALIZED_NOTIFICATIONS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Prune After Days
     |--------------------------------------------------------------------------
     |

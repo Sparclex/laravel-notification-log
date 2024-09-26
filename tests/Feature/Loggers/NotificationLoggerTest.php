@@ -3,6 +3,7 @@
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Support\Str;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
 use Okaufmann\LaravelNotificationLog\Tests\Support\DummyFailingNotification;
@@ -35,7 +36,8 @@ it('can log a sending notification event', function () {
         ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1)
         ->and($log->data)->toBe([])
-        ->and($log->sent_at)->toBeNull();
+        ->and($log->sent_at)->toBeNull()
+        ->and($log->notification_serialized)->toBe(null);
 });
 
 it('can log a sending notification without message when disabled', function () {
@@ -57,7 +59,8 @@ it('can log a sending notification without message when disabled', function () {
         ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1)
         ->and($log->data)->toBe([])
-        ->and($log->sent_at)->toBeNull();
+        ->and($log->sent_at)->toBeNull()
+        ->and($log->notification_serialized)->toBe(null);
 });
 
 it('can update a notification once it is sent', function () {
@@ -85,6 +88,7 @@ it('can update a notification once it is sent', function () {
         'status' => NotificationDeliveryStatus::SENT,
         'attempt' => 1,
         'sent_at' => now(),
+        'notification_serialized' => null,
     ]);
 });
 
@@ -112,6 +116,7 @@ it('can log a failed notification', function () {
         ], JSON_THROW_ON_ERROR),
         'attempt' => 1,
         'sent_at' => null,
+        'notification_serialized' => null,
     ]);
 });
 
@@ -140,6 +145,7 @@ it('does not log a failed notification twice', function () {
         ], JSON_THROW_ON_ERROR),
         'attempt' => 1,
         'sent_at' => null,
+        'notification_serialized' => null,
     ]);
 
 });
@@ -165,6 +171,7 @@ it('can log a notification sent to a anonymous notifiable', function () {
         ->and($log->message)->toMatchSnapshot()
         ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1)
+        ->and($log->notification_serialized)->toBe(null)
         ->and($log->data)->toBe([
             'from' => null,
             'to' => [
@@ -176,7 +183,8 @@ it('can log a notification sent to a anonymous notifiable', function () {
             'subject' => 'Dummy Notification Subject',
             'attachments' => [],
         ])
-        ->and($log->sent_at)->toBeNull();
+        ->and($log->sent_at)->toBeNull()
+        ->and($log->notification_serialized)->toBe(null);
 });
 
 it('it also logs notification extra data', function () {
@@ -197,5 +205,39 @@ it('it also logs notification extra data', function () {
         'notifiable_type' => get_class($notifiable),
         'channel' => 'database',
         'data' => json_encode(['extra' => 'data', 'response' => ['message' => 'dummy response']]),
+        'notification_serialized' => null,
     ]);
+});
+
+
+it('it stores serialized notification if enabled', function () {
+    $notifiable = new DummyNotifiable;
+    $notification = new DummyNotification;
+    $notification->id = 'ea354f33-33b9-4c83-b3ea-aff54d88af89';
+
+    $logger = new NotificationLogger;
+    config(['notification-log.store_serialized_notifications' => true]);
+    $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
+
+     expect($log->notification_id)->toBe($notification->id)
+        ->and($log->notification_type)->toBe(get_class($notification))
+        ->and($log->notifiable_type)->toBe(get_class($notifiable))
+        ->and($log->notifiable_id)->toBe($notifiable->getKey())
+        ->and($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id)
+        ->and($log->notification_serialized)->not()->toBeNull()->toMatchSnapshot();
+});
+
+it('it can unserialize a stored notificaton', function () {
+    $notifiable = new DummyNotifiable;
+    $notification = new DummyNotification;
+    $notification->id = 'ea354f33-33b9-4c83-b3ea-aff54d88af89';
+
+    $logger = new NotificationLogger;
+    config(['notification-log.store_serialized_notifications' => true]);
+    $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'database'));
+
+    /** @var DummyNotification $unserialized */
+    $unserialized = $log->notification();
+
+    expect($unserialized->fingerprint($notifiable))->toBe($notification->fingerprint($notifiable));
 });

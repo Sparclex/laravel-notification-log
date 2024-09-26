@@ -59,6 +59,7 @@ class NotificationLogger
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
             'status' => NotificationDeliveryStatus::SKIPPED,
             'data' => $data,
+            'notification_serialized' => $this->serializeNotification($event->notification),
         ]);
 
         $sentNotificationLog->save();
@@ -97,6 +98,7 @@ class NotificationLogger
             'message' => $this->resolveMessage($event->channel, $event->notification, $event->notifiable),
             'status' => NotificationDeliveryStatus::SENDING,
             'data' => $data,
+            'notification_serialized' => $this->serializeNotification($event->notification),
         ]);
 
         $sentNotificationLog->save();
@@ -571,5 +573,14 @@ class NotificationLogger
             })
             ->filter()
             ->toArray();
+    }
+
+    protected function serializeNotification(Notification $notification)
+    {
+        if (! config('notification-log.store_serialized_notifications')) {
+            return null;
+        }
+
+        return serialize($notification);
     }
 }

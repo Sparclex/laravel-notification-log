@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('status')->nullable();
             $table->integer('attempt')->default(1);
             $table->dateTime('sent_at')->nullable();
+            $table->text('notification_serialized')->nullable();
             $table->timestamps();
 
             $table->index(['notifiable_type', 'notifiable_id'], 'notification_logs_sent_notifs_type_id_idx');
