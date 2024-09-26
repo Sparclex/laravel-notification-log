@@ -130,4 +130,9 @@ class SentNotificationLog extends Model
 
         $notifiable->notifyNow($notification->markAsResending(), $channels);
     }
+
+    public function canResendNotification(): bool
+    {
+        return ! empty($this->notification_serialized);
+    }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Carbon;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
+use Okaufmann\LaravelNotificationLog\Tests\Support\DummyNotificationResendable;
 use Okaufmann\LaravelNotificationLog\Tests\Support\TestUser;
 
 beforeEach(function () {
@@ -137,6 +138,20 @@ it('can find the latest notification in a certain period', function () {
         after: createCarbon('2023-01-03'))
     )
         ->toHaveCreationDate('2023-01-05');
+});
+
+it('can detect a resendable sent notification log', function () {
+    $sentNotificationLog = new SentNotificationLog;
+    $sentNotificationLog->notification_serialized = serialize(new DummyNotificationResendable);
+
+    expect($sentNotificationLog->canResendNotification())->toBeTrue();
+});
+
+it('can detect a not resendable sent notification log', function () {
+    $sentNotificationLog = new SentNotificationLog;
+    $sentNotificationLog->notification_serialized = null;
+
+    expect($sentNotificationLog->canResendNotification())->toBeFalse();
 });
 
 function createCarbon($date): Carbon
