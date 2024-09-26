@@ -66,8 +66,8 @@ it('sends notifications with same fingerprint but different channels', function 
 });
 
 it('sends a unique notification when it is resending', function () {
-    $notifiable = new TestUser();
-    $notification = new DummyNotificationUniqueResendable();
+    $notifiable = new TestUser;
+    $notification = new DummyNotificationUniqueResendable;
     $listener = resolve(NotificationEventListener::class);
 
     config(['notification-log.resolve_notification_message' => true]);
@@ -78,8 +78,8 @@ it('sends a unique notification when it is resending', function () {
 });
 
 it('does not send a resendable unique notification when it is not resending', function () {
-    $notifiable = new TestUser();
-    $notification = new DummyNotificationUniqueResendable();
+    $notifiable = new TestUser;
+    $notification = new DummyNotificationUniqueResendable;
     $listener = resolve(NotificationEventListener::class);
 
     config(['notification-log.resolve_notification_message' => true]);
