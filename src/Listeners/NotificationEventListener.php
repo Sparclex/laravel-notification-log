@@ -8,7 +8,7 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Okaufmann\LaravelNotificationLog\Contracts\EnsureUniqueNotification;
 use Okaufmann\LaravelNotificationLog\Loggers\NotificationLogger;
 
-class MessageEventListener
+class NotificationEventListener
 {
     public function __construct(
         protected readonly NotificationLogger $notificationLogger,
