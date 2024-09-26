@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('queued')->default(false);
             $table->string('channel')->nullable();
             $table->json('data')->nullable();
-            $table->json('message')->nullable();
+            $table->longText('message')->nullable();
             $table->string('status')->nullable();
             $table->integer('attempt')->default(1);
             $table->dateTime('sent_at')->nullable();
