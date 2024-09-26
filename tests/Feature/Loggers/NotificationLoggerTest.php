@@ -145,27 +145,37 @@ it('does not log a failed notification twice', function () {
 });
 
 it('can log a notification sent to a anonymous notifiable', function () {
-    $notifiable = new \Illuminate\Notifications\AnonymousNotifiable;
+    $notifiable = new AnonymousNotifiable;
     $route = fake()->safeEmail();
     $notifiable->route('mail', $route);
-    $notification = new DummyNotification;
+    $notification = new DummyMailNotification;
 
     $logger = new NotificationLogger;
     config(['notification-log.resolve-notification-message' => true]);
     $log = $logger->logSendingNotification(new NotificationSending($notifiable, $notification, 'mail'));
 
     expect($log->notification_id)->toBe($notification->id)
-        ->and($log->notification_type)->toBe(DummyNotification::class)
+        ->and($log->notification_type)->toBe(DummyMailNotification::class)
         ->and($log->notifiable_type)->toBeNull()
         ->and($log->notifiable_id)->toBeNull()
         ->and($log->fingerprint)->toBe('dummy-fingerprint-'.$notification->id)
         ->and($log->anonymous_notifiable_routes)->toBe(['mail' => $route])
         ->and($log->queued)->toBeFalse()
         ->and($log->channel)->toBe('mail')
-        ->and($log->message)->toBeNull()
+        ->and($log->message)->toMatchSnapshot()
         ->and($log->status)->toBe(NotificationDeliveryStatus::SENDING)
         ->and($log->attempt)->toBe(1)
-        ->and($log->data)->toBeNull()
+        ->and($log->data)->toBe([
+            'from' => null,
+            'to' => [
+                $route,
+            ],
+            'cc' => null,
+            'bcc' => null,
+            'reply_to' => null,
+            'subject' => 'Dummy Notification Subject',
+            'attachments' => [],
+        ])
         ->and($log->sent_at)->toBeNull();
 });
 
