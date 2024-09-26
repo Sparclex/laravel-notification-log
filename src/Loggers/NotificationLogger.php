@@ -391,6 +391,7 @@ class NotificationLogger
             }
 
             return [
+                'from' => $this->listEmailAddresses($rawMessage->getFrom()),
                 'to' => $this->listEmailAddresses($rawMessage->getTo()),
                 'cc' => $this->listEmailAddresses($rawMessage->getCc()),
                 'bcc' => $this->listEmailAddresses($rawMessage->getBcc()),
