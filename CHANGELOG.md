@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-notification-log` will be documented in this file.
 
+## 4.3.0 - 2024-09-26
+
+### What's Changed
+
+- Added support to check if a notification log can resend its notification
+
+**Full Changelog**: https://github.com/okaufmann/laravel-notification-log/compare/4.2.0...4.3.0
+
 ## 4.2.0 - 2024-09-26
 
 ### What's Changed
@@ -30,11 +38,13 @@ return new class extends Migration {
 };
 
 
+
 ```
 Also you may want to publish the configs by running
 
 ```shell
 php artisan vendor:publish --tag="notification-log-config"
+
 
 ```
 **Full Changelog**: https://github.com/okaufmann/laravel-notification-log/compare/4.1.2...4.2.0
@@ -147,6 +157,7 @@ return new class extends Migration {
         return $data;
     }
 };
+
 
 
 
