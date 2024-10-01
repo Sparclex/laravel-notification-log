@@ -23,6 +23,7 @@ use Okaufmann\LaravelNotificationLog\Contracts\ResendableNotification;
 use Okaufmann\LaravelNotificationLog\Contracts\ShouldLogNotification;
 use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
 use Okaufmann\LaravelNotificationLog\NotificationDeliveryStatus;
+use Spatie\Regex\Regex;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -421,6 +422,7 @@ class NotificationLogger
             }
 
             return [
+                'message_id' => $this->cleanMessageId($response->getMessageId()),
                 'from' => $this->listEmailAddresses($rawMessage->getFrom()),
                 'to' => $this->listEmailAddresses($rawMessage->getTo()),
                 'cc' => $this->listEmailAddresses($rawMessage->getCc()),
@@ -586,5 +588,20 @@ class NotificationLogger
         }
 
         return serialize($notification);
+    }
+
+    protected function cleanMessageId(?string $messageId): string
+    {
+        if (blank($messageId)) {
+            return '';
+        }
+
+
+        $matchResult = Regex::match('/<(.*)>/', $messageId);
+        if(! $matchResult->hasMatch()) {
+            return $messageId;
+        }
+
+        return $matchResult->group(1);
     }
 }
