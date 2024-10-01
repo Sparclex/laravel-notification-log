@@ -596,9 +596,8 @@ class NotificationLogger
             return '';
         }
 
-
         $matchResult = Regex::match('/<(.*)>/', $messageId);
-        if(! $matchResult->hasMatch()) {
+        if (! $matchResult->hasMatch()) {
             return $messageId;
         }
 
