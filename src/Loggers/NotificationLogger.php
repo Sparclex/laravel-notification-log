@@ -39,7 +39,7 @@ class NotificationLogger
         $this->increaseNotificationAttempt($event);
 
         /** @var SentNotificationLog $sentNotificationLog */
-        $sentNotificationLog = SentNotificationLog::query()->firstOrNew([
+        $sentNotificationLog = $this->getNotificationModelType()::query()->firstOrNew([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->resolveChannel($event->channel),
@@ -78,7 +78,7 @@ class NotificationLogger
         $this->increaseNotificationAttempt($event);
 
         /** @var SentNotificationLog $sentNotificationLog */
-        $sentNotificationLog = SentNotificationLog::query()->firstOrNew([
+        $sentNotificationLog = $this->getNotificationModelType()::query()->firstOrNew([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->resolveChannel($event->channel),
@@ -119,7 +119,7 @@ class NotificationLogger
         }
 
         /** @var SentNotificationLog $sentNotificationLog */
-        $sentNotificationLog = SentNotificationLog::query()->firstOrNew([
+        $sentNotificationLog = $this->getNotificationModelType()::query()->firstOrNew([
             'notification_id' => $this->getNotificationId($event->notification),
             'notification_type' => $this->getNotificationType($event),
             'channel' => $this->resolveChannel($event->channel),
@@ -156,7 +156,7 @@ class NotificationLogger
             'attempt' => $event->notification->getCurrentAttempt(),
         ];
 
-        $notificationLog = SentNotificationLog::query()
+        $notificationLog = $this->getNotificationModelType()::query()
             ->where($findData)
             ->first();
 
@@ -173,7 +173,7 @@ class NotificationLogger
             return $notificationLog;
         }
 
-        $notificationLog = SentNotificationLog::updateOrCreate(
+        $notificationLog = $this->getNotificationModelType()::updateOrCreate(
             $findData,
             [
                 'data' => $event->data,
@@ -397,7 +397,7 @@ class NotificationLogger
     {
         assert($event->notification instanceof ShouldLogNotification);
 
-        $currentAttempt = SentNotificationLog::query()
+        $currentAttempt = $this->getNotificationModelType()::query()
             ->where('notification_id', $this->getNotificationId($event->notification))
             ->where('channel', $event->channel)
             ->max('attempt');
@@ -602,5 +602,10 @@ class NotificationLogger
         }
 
         return $matchResult->group(1);
+    }
+
+    protected function getNotificationModelType(): string
+    {
+        return config('notification-log.model');
     }
 }

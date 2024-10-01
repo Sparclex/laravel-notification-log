@@ -28,7 +28,7 @@ trait HasNotifiableHistory
         ?Carbon $after = null,
         string|array|null $channel = null,
     ): Builder {
-        return SentNotificationLog::latestForQuery(
+        return $this->getNotificationModelType()::latestForQuery(
             $this,
             ...func_get_args(),
         );
@@ -36,8 +36,13 @@ trait HasNotifiableHistory
 
     public function notificationLogItems(): MorphMany
     {
-        return $this->morphMany(SentNotificationLog::class, 'notifiable')
+        return $this->morphMany($this->getNotificationModelType(), 'notifiable')
             ->orderByDesc('created_at')
             ->orderByDesc($this->getKeyName());
+    }
+
+    protected function getNotificationModelType(): string
+    {
+        return config('notification-log.model');
     }
 }

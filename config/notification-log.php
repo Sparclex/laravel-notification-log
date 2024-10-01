@@ -1,5 +1,7 @@
 <?php
 
+use Okaufmann\LaravelNotificationLog\Models\SentNotificationLog;
+
 return [
 
     /*
@@ -52,4 +54,14 @@ return [
     */
 
     'log_all_by_default' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Log Model
+    |--------------------------------------------------------------------------
+    |
+    | Specify the model to use for logging notifications.
+    |
+    */
+    'model' => SentNotificationLog::class,
 ];
