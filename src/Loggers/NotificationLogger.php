@@ -257,6 +257,10 @@ class NotificationLogger
 
             return null;
         } catch (\Throwable $e) {
+            if (app()->runningUnitTests()) {
+                throw $e;
+            }
+
             return null;
         }
     }
