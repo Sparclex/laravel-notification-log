@@ -151,6 +151,8 @@ it('does not log a failed notification twice', function () {
 });
 
 it('can log a notification sent to a anonymous notifiable', function () {
+    \Illuminate\Support\Facades\View::addLocation('tests/Support/views');
+
     $notifiable = new AnonymousNotifiable;
     $route = fake()->safeEmail();
     $notifiable->route('mail', $route);

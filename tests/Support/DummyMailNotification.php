@@ -26,7 +26,7 @@ class DummyMailNotification extends Notification implements ShouldLogNotificatio
     {
         return (new MailMessage)
             ->subject('Dummy Notification Subject')
-            ->line('This is just an example text');
+            ->text('dummy-text-message');
     }
 
     public function fingerprint($notifiable)
