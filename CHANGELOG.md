@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-notification-log` will be documented in this file.
 
+## 5.0.0 - 2025-03-09
+
+### What's Changed
+
+* Support Laravel 12
+* chore(deps): bump dependabot/fetch-metadata from 2.1.0 to 2.3.0 by @dependabot in https://github.com/okaufmann/laravel-notification-log/pull/3
+* chore(deps): bump actions/checkout from 3 to 4 by @dependabot in https://github.com/okaufmann/laravel-notification-log/pull/6
+* chore(deps): bump stefanzweifel/git-auto-commit-action from 4 to 5 by @dependabot in https://github.com/okaufmann/laravel-notification-log/pull/5
+* chore(deps): bump aglipanci/laravel-pint-action from 1.0.0 to 2.3.1 by @dependabot in https://github.com/okaufmann/laravel-notification-log/pull/4
+
+### New Contributors
+
+* @dependabot made their first contribution in https://github.com/okaufmann/laravel-notification-log/pull/3
+
+**Full Changelog**: https://github.com/okaufmann/laravel-notification-log/compare/4.6.0...5.0.0
+
 ## 4.6.0 - 2024-10-01
 
 ### What's Changed
@@ -66,11 +82,13 @@ return new class extends Migration {
 
 
 
+
 ```
 Also you may want to publish the configs by running
 
 ```shell
 php artisan vendor:publish --tag="notification-log-config"
+
 
 
 
@@ -187,6 +205,7 @@ return new class extends Migration {
         return $data;
     }
 };
+
 
 
 
